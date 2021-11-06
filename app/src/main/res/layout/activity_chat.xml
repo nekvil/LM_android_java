@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    tools:context=".chatActivity">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="0dp"
+        android:background="@color/ic_launcher_background">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="4dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/myapptext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LM"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold">
+
+            </TextView>
+
+
+        </RelativeLayout>
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+<!--    <com.google.android.material.tabs.TabLayout-->
+<!--        android:id="@+id/include"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="?attr/actionBarSize"-->
+<!--        android:layout_below="@id/toolbar"-->
+<!--        android:layout_marginTop="0dp"-->
+<!--        android:backgroundTint="#CD272727"-->
+<!--        android:elevation="4dp"-->
+<!--        app:tabIndicatorColor="@color/ic_launcher_background"-->
+<!--        app:tabIndicatorHeight="3dp"-->
+<!--        app:tabSelectedTextColor="@color/ic_launcher_background"-->
+<!--        app:tabTextColor="#CCFFFFFF">-->
+
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:id="@+id/chat"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Чаты">-->
+
+<!--        </com.google.android.material.tabs.TabItem>-->
+
+<!--&lt;!&ndash;        <com.google.android.material.tabs.TabItem&ndash;&gt;-->
+<!--&lt;!&ndash;            android:id="@+id/status"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:text="Статус">&ndash;&gt;-->
+
+<!--&lt;!&ndash;        </com.google.android.material.tabs.TabItem>&ndash;&gt;-->
+
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:id="@+id/calls"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Звонки">-->
+
+<!--        </com.google.android.material.tabs.TabItem>-->
+
+
+<!--    </com.google.android.material.tabs.TabLayout>-->
+
+
+<!--    <androidx.viewpager.widget.ViewPager-->
+<!--        android:id="@+id/fragmentcontainer"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_below="@id/include"-->
+<!--        android:layout_marginTop="0dp">-->
+
+<!--    </androidx.viewpager.widget.ViewPager>-->
+
+    <!--Один фрагмент без табов-->
+    <androidx.fragment.app.FragmentContainerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:name="com.example.lm.chatFragment" />
+
+  </RelativeLayout>
