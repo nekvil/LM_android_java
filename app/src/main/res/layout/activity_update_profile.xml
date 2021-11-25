@@ -4,16 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
     tools:context=".UpdateProfile">
 
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarofupdateprofile"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="0dp"
-        android:background="@color/ic_launcher_background">
+        app:elevation="5dp"
+        android:elevation="5dp"
+        android:background="?attr/colorSecondaryVariant"
+        tools:targetApi="lollipop"
+        android:theme="@style/MyThemeOverlay_Toolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -26,8 +28,7 @@
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_baseline_arrow_back_24"
-                app:tint="@color/white">
+                android:src="@drawable/ic_baseline_arrow_back_24">
 
             </ImageButton>
 
@@ -37,10 +38,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/backbuttonofupdateprofile"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/backbuttonofupdateprofile"
                 android:text="Профиль"
-                android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold">
 
@@ -50,105 +50,122 @@
         </RelativeLayout>
 
 
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/getnewuserimage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_below="@+id/toolbarofupdateprofile"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="37dp"
-        android:layout_marginBottom="50dp"
-        app:cardCornerRadius="130dp"
-        app:cardBackgroundColor="@color/white_87">
-
-
-        <ImageView
-            android:id="@+id/getnewuserimageinimageview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/defprof"
-            >
-
-        </ImageView>
-
-
-    </androidx.cardview.widget.CardView>
-
-
-    <EditText
-        android:id="@+id/getnewusername"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="120dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginRight="0dp"
-        android:ellipsize="end"
-        android:hint="Имя"
-        android:inputType="textCapWords"
-        android:maxLength="25"
-        android:textColor="#FFFFFF">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbarofupdateprofile">
 
-    </EditText>
+        <EditText
+            android:id="@+id/getnewusername"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:inputType="textCapWords"
+            android:maxWidth="300dp"
+            android:minWidth="220dp"
+            app:layout_constraintBottom_toTopOf="@+id/progressbarofupdateprofile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/getnewuserimage"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread">
+        </EditText>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:text="Имя"
+            android:textSize="14sp"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            app:layout_constraintBottom_toTopOf="@+id/getnewusername"
+            app:layout_constraintStart_toStartOf="@+id/getnewusername"
+            app:layout_constraintTop_toBottomOf="@+id/getnewuserimage"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/currentStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Статус"
+            android:textSize="14sp"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.WindowTitle"
+            app:layout_constraintBottom_toTopOf="@+id/getnewusername"
+            app:layout_constraintEnd_toEndOf="@+id/getnewusername" />
+
+        <TextView
+            android:id="@+id/userPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:text="Номер телефона"
+            android:textSize="14sp"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            app:layout_constraintBottom_toTopOf="@+id/progressbarofupdateprofile"
+            app:layout_constraintStart_toStartOf="@+id/getnewusername"
+            app:layout_constraintTop_toBottomOf="@+id/getnewusername"
+            app:layout_constraintVertical_bias="0" />
+
+        <ProgressBar
+            android:id="@+id/progressbarofupdateprofile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/updateprofilebutton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/getnewusername">
+
+        </ProgressBar>
+
+        <Button
+            android:id="@+id/updateprofilebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:maxWidth="300dp"
+            android:minWidth="200dp"
+            android:text="Подтвердить"
+            android:textColor="?attr/colorPrimaryVariant"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressbarofupdateprofile">
+
+        </Button>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/getnewuserimage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="10dp"
+            app:cardCornerRadius="50dp"
+            app:layout_constraintBottom_toBottomOf="@+id/getnewusername"
+            app:layout_constraintEnd_toStartOf="@+id/getnewusername"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/getnewusername">
 
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/getnewusername"
-        android:layout_marginStart="60dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginBottom="0dp"
-        android:text="Имя"
-        android:textColor="#DEFFFFFF"
-        android:textSize="14sp" />
+            <ImageView
+                android:id="@+id/getnewuserimageinimageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/defprof">
 
-    <android.widget.Button
-        android:id="@+id/updateprofilebutton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="40dp"
-
-        android:layout_marginRight="40dp"
-        android:layout_marginBottom="45dp"
-        android:background="@drawable/button_custom"
-        android:text="Сохранить"
-        android:textColor="@color/white">
-
-    </android.widget.Button>
+            </ImageView>
 
 
-    <ProgressBar
-        android:id="@+id/progressbarofupdateprofile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/getnewusername"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="83dp"
-        android:layout_marginBottom="119dp"
-        android:visibility="invisible">
+        </androidx.cardview.widget.CardView>
 
-    </ProgressBar>
-
-    <ImageView
-        android:id="@+id/logoofviewprofile"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_alignLeft="@id/getnewusername"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="-40dp"
-        android:layout_marginLeft="-40dp"
-        android:src="@drawable/ic_baseline_person_24"
-        app:tint="#DEFFFFFF" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </RelativeLayout>

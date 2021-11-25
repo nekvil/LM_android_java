@@ -1,44 +1,70 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.LM" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.LM" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">#EC144C</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/main</item>
+        <item name="colorPrimaryVariant">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/white</item>
-        <item name="colorSecondaryVariant">@color/ic_launcher_background</item>
+        <item name="colorSecondary">@color/main</item>
+        <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/black</item>
-        <item name="android:textColorSecondary">@color/white</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-        <item name="android:textColorHint">#DFDFDF</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">#EFEFEF</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+
+        <!-- SearchViewStyle. -->
         <item name="searchViewStyle">@style/SearchViewMy</item>
-        <!--        <item name = "android:textCursorDrawable">@color/white</item>-->
-    </style>
-
-    <style name="Theme.Auth" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:statusBarColor" tools:targetApi="l">#121212</item>
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">#EC144C</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/white</item>
-        <item name="colorSecondaryVariant">@color/ic_launcher_background</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="android:textColorHint">#DFDFDF</item>
-    </style>
-
-    <style name="SplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash</item>
-        <item name="android:statusBarColor" tools:targetApi="l">@color/ic_launcher_background</item>
     </style>
 
     <style name="SearchViewMy" parent="Widget.AppCompat.Light.SearchView">
         <item name="searchHintIcon">@null</item>
     </style>
 
+    <style name="LineTheme" parent="Theme.LM">
+        <item name="android:background">#26000000</item>
+    </style>
+
+    <style name="RecTheme" parent="Theme.LM">
+        <item name="android:background" >@drawable/receiver_chat_drawable</item>
+    </style>
+
+    <style name="SenTheme" parent="Theme.LM">
+        <item name="android:background" >@drawable/sender_chat_drawable</item>
+    </style>
+
+    <style name="MessageBackTheme" parent="@android:style/Widget.EditText">
+        <item name="android:background" >@drawable/message_background</item>
+    </style>
+
+    <style name="ChatTheme"  parent="Theme.LM">
+        <item name="editTextStyle">@style/MessageBackTheme</item>
+    </style>
+
+    <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="Theme.Auth" parent="Theme.LM">
+        <!-- Status bar color. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/white</item>
+        <!-- Action bar color. -->
+        <item name="android:actionBarItemBackground" tools:targetApi="l">?attr/colorOnPrimary</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/main</item>
+    </style>
+
+    <style name="ThemeOverlay.ActionBar" parent="">
+        <item name="colorPrimary">@color/white</item>
+    </style>
 
 </resources>

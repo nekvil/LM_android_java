@@ -4,88 +4,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
     tools:context=".setProfile">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/getuserimage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
-        android:fontFamily="@font/raleway"
-        android:text="Создание профиля"
-        android:textColor="#DEFFFFFF"
-        android:textSize="30sp"
-        android:textStyle="bold">
 
-    </TextView>
-
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/getuserimage"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
-        android:layout_above="@+id/getusername"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="80dp"
-        android:layout_marginBottom="20dp"
-        app:cardCornerRadius="130dp"
-        app:cardBackgroundColor="@color/white_87">
-
-
-        <ImageView
-            android:id="@+id/getuserimageinimageview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/defprof"
-            >
-
-        </ImageView>
-
-
-    </androidx.cardview.widget.CardView>
-
-
-    <EditText
-        android:id="@+id/getusername"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="70dp"
-        android:layout_marginRight="70dp"
-        android:hint="Имя"
-        android:inputType="textCapWords"
-        android:textColor="#DEFFFFFF"
-        android:maxLength="25">
+        android:layout_height="match_parent">
 
-    </EditText>
+        <TextView
+            android:id="@+id/setprofile_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/raleway"
+            android:text="Создание профиля"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            app:layout_constraintBottom_toTopOf="@+id/getuserimage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <android.widget.Button
-        android:id="@+id/saveProfile"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/getusername"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_custom"
-        android:text="Подтвердить"
-        android:textColor="@color/white">
+        </TextView>
 
-    </android.widget.Button>
+        <Button
+            android:id="@+id/saveProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:maxWidth="300dp"
+            android:minWidth="200dp"
+            android:text="Подтвердить"
+            android:textColor="?attr/colorPrimaryVariant"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressbarofsetProfile">
+
+        </Button>
+
+        <ProgressBar
+            android:id="@+id/progressbarofsetProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/saveProfile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/getusername">
+
+        </ProgressBar>
+
+        <EditText
+            android:id="@+id/getusername"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:hint="Имя"
+            android:inputType="textCapWords"
+            android:maxWidth="300dp"
+            android:minWidth="300dp"
+            android:textAlignment="gravity"
+            app:layout_constraintBottom_toTopOf="@+id/progressbarofsetProfile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/getuserimage"
+            app:layout_constraintVertical_bias="0.5">
+
+        </EditText>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/getuserimage"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            app:cardCornerRadius="130dp"
+            app:layout_constraintBottom_toTopOf="@+id/getusername"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/setprofile_title">
 
 
-    <ProgressBar
-        android:id="@+id/progressbarofsetProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/saveProfile"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:visibility="invisible">
+            <ImageView
+                android:id="@+id/getuserimageinimageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/defprof">
 
-    </ProgressBar>
+            </ImageView>
+
+
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </RelativeLayout>

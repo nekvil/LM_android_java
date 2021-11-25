@@ -18,19 +18,21 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class otpAuthentication extends AppCompatActivity {
 
     TextView mchangenumber;
     EditText mgetotp;
     android.widget.Button mverifyotp;
-    String enteredotp;
 
+    FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
     ProgressBar mprogressbarofotpauth;
 
-
-
+    String enteredotp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,6 @@ public class otpAuthentication extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(otpAuthentication.this,MainActivity.class);
-
                 startActivity(intent);
             }
         });
@@ -68,13 +69,31 @@ public class otpAuthentication extends AppCompatActivity {
                     String coderecieved=getIntent().getStringExtra("otp");
                     PhoneAuthCredential credential= PhoneAuthProvider.getCredential(coderecieved,enteredotp);
                     signInWithPhoneAuthCredential(credential);
-
                 }
             }
         });
 
+    }
 
 
+    public interface FirebaseCallback {
+        void onResponse(Boolean validUser);
+    }
+
+
+    public void readFirebaseName(FirebaseCallback callback) {
+        firebaseFirestore=FirebaseFirestore.getInstance();
+        DocumentReference databaseRef = firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
+        databaseRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    callback.onResponse(document.exists());
+                }
+            }
+        });
     }
 
 
@@ -85,11 +104,24 @@ public class otpAuthentication extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful())
                 {
-                    mprogressbarofotpauth.setVisibility(View.INVISIBLE);
-//                    Toast.makeText(getApplicationContext(),"Авторизация",Toast.LENGTH_SHORT).show();
-                    Intent intent=new Intent(otpAuthentication.this, com.example.lm.setProfile.class);
-                    startActivity(intent);
-                    finish();
+                    readFirebaseName(new FirebaseCallback() {
+                        @Override
+                        public void onResponse(Boolean validUser) {
+                            mprogressbarofotpauth.setVisibility(View.INVISIBLE);
+                            if (validUser){
+                                Intent intent=new Intent(otpAuthentication.this, com.example.lm.chatActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                            else{
+                                Intent intent=new Intent(otpAuthentication.this, com.example.lm.setProfile.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    });
+
+
                 }
                 else
                 {
@@ -102,12 +134,12 @@ public class otpAuthentication extends AppCompatActivity {
             }
         });
 
-
-
-
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
 }

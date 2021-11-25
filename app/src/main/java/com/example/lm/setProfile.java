@@ -36,24 +36,19 @@ public class setProfile extends AppCompatActivity {
 
     private CardView mgetuserimage;
     private ImageView mgetuserimageinimageview;
-    private static int PICK_IMAGE=123;
     private Uri imagepath;
-
     private EditText mgetusername;
-
     private android.widget.Button msaveprofile;
-
-    private FirebaseAuth firebaseAuth;
-    private String name;
-
-    private FirebaseStorage firebaseStorage;
-    private StorageReference storageReference;
-
-    private String ImageUriAcessToken;
-
-    private FirebaseFirestore firebaseFirestore;
+    private static int PICK_IMAGE=123;
 
     ProgressBar mprogressbarofsetprofile;
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseStorage firebaseStorage;
+    private StorageReference storageReference;
+    private FirebaseFirestore firebaseFirestore;
+
+    private String name, ImageUriAcessToken;
 
 
     @Override
@@ -66,13 +61,14 @@ public class setProfile extends AppCompatActivity {
         storageReference=firebaseStorage.getReference();
         firebaseFirestore=FirebaseFirestore.getInstance();
 
-
         mgetusername=findViewById(R.id.getusername);
         mgetuserimage=findViewById(R.id.getuserimage);
         mgetuserimageinimageview=findViewById(R.id.getuserimageinimageview);
         msaveprofile=findViewById(R.id.saveProfile);
         mprogressbarofsetprofile=findViewById(R.id.progressbarofsetProfile);
 
+        mgetusername.setText(firebaseAuth.getCurrentUser().getPhoneNumber());
+        setDefaultProfile();
 
         mgetuserimage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +99,9 @@ public class setProfile extends AppCompatActivity {
 
                     mprogressbarofsetprofile.setVisibility(View.VISIBLE);
                     sendDataForNewUser();
+                    Toast.makeText(getApplicationContext(),"Пользователь успешно зарегистрирован",Toast.LENGTH_SHORT).show();
                     mprogressbarofsetprofile.setVisibility(View.INVISIBLE);
+
                     Intent intent=new Intent(setProfile.this, com.example.lm.chatActivity.class);
                     startActivity(intent);
                     finish();
@@ -113,30 +111,36 @@ public class setProfile extends AppCompatActivity {
     }
 
 
+    private void setDefaultProfile(){
+        String pkgName = getApplicationContext().getPackageName();
+        Uri path = Uri.parse("android.resource://"+pkgName+"/" + R.drawable.defprof);
+        imagepath = path;
+        sendDataForNewUser();
+        imagepath = null;
+    }
+
+
     private void sendDataForNewUser()
     {
         sendDataToRealTimeDatabase();
     }
+
 
     private void sendDataToRealTimeDatabase()
     {
         name=mgetusername.getText().toString().trim();
         FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
         DatabaseReference databaseReference=firebaseDatabase.getReference(firebaseAuth.getUid());
-
-        userprofile muserprofile=new userprofile(name,firebaseAuth.getUid(),"Online");
+        userprofile muserprofile=new userprofile(name,firebaseAuth.getUid(),"Offline","None");
         databaseReference.setValue(muserprofile);
-        Toast.makeText(getApplicationContext(),"Пользователь успешно зарегистрирован",Toast.LENGTH_SHORT).show();
-        sendImagetoStorage();
-
+        sendImageToStorage();
     }
 
-    private void sendImagetoStorage()
+
+    private void sendImageToStorage()
     {
 
         StorageReference imageref=storageReference.child("Images").child(firebaseAuth.getUid()).child("Profile Pic");
-
-        //Image compresesion
 
         Bitmap bitmap=null;
         try {
@@ -171,11 +175,8 @@ public class setProfile extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(getApplicationContext(),"URI не получен",Toast.LENGTH_SHORT).show();
                     }
-
-
                 });
 //                Toast.makeText(getApplicationContext(),"Изображение загружено",Toast.LENGTH_SHORT).show();
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -183,32 +184,23 @@ public class setProfile extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Изображение не загружено",Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
-
-
     }
 
+
     private void sendDataTocloudFirestore() {
-
-
         DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
         Map<String , Object> userdata=new HashMap<>();
         userdata.put("name",name);
         userdata.put("image",ImageUriAcessToken);
         userdata.put("uid",firebaseAuth.getUid());
-        userdata.put("status","Online");
+        documentReference.set(userdata);
 
-        documentReference.set(userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-//                Toast.makeText(getApplicationContext(),"Данные успешно отправлены на Cloud Firestore",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-
+//        documentReference.set(userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+//            @Override
+//            public void onSuccess(Void aVoid) {
+////                Toast.makeText(getApplicationContext(),"Данные успешно отправлены на Cloud Firestore",Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 
@@ -220,14 +212,14 @@ public class setProfile extends AppCompatActivity {
             imagepath=data.getData();
             mgetuserimageinimageview.setImageURI(imagepath);
         }
-
-
-
-
         super.onActivityResult(requestCode, resultCode, data);
+
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
 }

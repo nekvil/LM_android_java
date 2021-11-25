@@ -24,7 +24,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
+
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -79,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Uri uri) {
                 ImageURIacessToken=uri.toString();
-                Picasso.get().load(uri).into(mviewuserimageinimageview);
+//                Picasso.get().load(uri).into(mviewuserimageinimageview);
 
             }
         });
@@ -109,9 +109,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-
-
-
     }
 
 
@@ -125,8 +122,6 @@ public class ProfileActivity extends AppCompatActivity {
 //                Toast.makeText(getApplicationContext(),"Now User is Offline",Toast.LENGTH_SHORT).show();
             }
         });
-
-
 
     }
 

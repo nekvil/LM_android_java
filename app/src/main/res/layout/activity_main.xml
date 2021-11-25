@@ -4,119 +4,118 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
     tools:context=".MainActivity">
 
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:src="@mipmap/ic_launcher_round">
-
-    </ImageView>
-
-
-    <TextView
-        android:id="@+id/textheading"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/logo"
-        android:fontFamily="@font/raleway"
-        android:gravity="center_horizontal"
-        android:padding="90dp"
-        android:text="На ваш номер придёт одноразовый код"
-        android:textAlignment="center"
-        android:textColor="#DEFFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold">
+        android:layout_height="match_parent">
 
-    </TextView>
+        <ProgressBar
+            android:id="@+id/progressbarofmain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/sendotpbutton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/getphonenumber">
 
+        </ProgressBar>
 
-    <RelativeLayout
-        android:id="@+id/centerhorizontalline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true">
+        <TextView
+            android:id="@+id/textheading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/raleway"
+            android:gravity="center_horizontal"
+            android:maxWidth="350dp"
+            android:minWidth="250dp"
+            android:padding="20dp"
+            android:text="На ваш номер придёт одноразовый код"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            app:layout_constraintBottom_toTopOf="@+id/getphonenumber"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logo">
 
-    </RelativeLayout>
+        </TextView>
 
+        <EditText
+            android:id="@+id/getphonenumber"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:textAlignment="gravity"
+            android:inputType="phone"
+            android:maxWidth="200dp"
+            android:minWidth="200dp"
+            android:maxLength="15"
+            app:layout_constraintBottom_toTopOf="@+id/progressbarofmain"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/countrycodepicker"
+            app:layout_constraintTop_toBottomOf="@+id/textheading">
 
-    <com.hbb20.CountryCodePicker
-        android:id="@+id/countrycodepicker"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_above="@id/centerhorizontalline"
-        android:layout_alignTop="@+id/centerhorizontalline"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="-50dp"
-        app:ccpDialog_backgroundColor="@color/white"
-        app:ccp_areaCodeDetectedCountry="true"
-        app:ccp_autoDetectCountry="true"
-        app:ccp_contentColor="#DEFFFFFF"
-        app:ccp_countryPreference="RU,BY,UA"
-        app:ccp_defaultLanguage="RUSSIAN"
-        app:ccp_defaultNameCode="RU">
+        </EditText>
 
-    </com.hbb20.CountryCodePicker>
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher_round"
+            app:layout_constraintBottom_toTopOf="@+id/textheading"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread">
 
-    <EditText
-        android:id="@+id/getphonenumber"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@id/centerhorizontalline"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_toEndOf="@+id/countrycodepicker"
-        android:layout_toRightOf="@+id/countrycodepicker"
+        </ImageView>
 
-        android:inputType="number"
+        <Button
+            android:id="@+id/sendotpbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:maxWidth="300dp"
+            android:minWidth="200dp"
+            android:text="Подтвердить"
+            android:textColor="?attr/colorPrimaryVariant"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressbarofmain">
+        </Button>
 
-        android:textColor="#DEFFFFFF">
+        <com.hbb20.CountryCodePicker
+            android:id="@+id/countrycodepicker"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:gravity="center"
+            app:ccp_areaCodeDetectedCountry="true"
+            app:ccp_autoDetectCountry="true"
+            app:ccp_countryPreference="RU,BY,UA"
+            app:ccp_defaultLanguage="RUSSIAN"
+            app:ccp_defaultNameCode="RU"
+            app:ccp_textSize="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/progressbarofmain"
+            app:layout_constraintEnd_toStartOf="@+id/getphonenumber"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textheading"
+            app:ccpDialog_backgroundColor = "?attr/colorOnPrimary"
+            app:ccpDialog_textColor = "?attr/colorOnBackground"
+            app:ccpDialog_fastScroller_bubbleColor = "?attr/colorOnPrimary"
+            app:ccp_contentColor = "?attr/colorOnBackground">
 
-    </EditText>
-
-    <android.widget.Button
-        android:id="@+id/sendotpbutton"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@id/getphonenumber"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/button_custom"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:text="Отправить"
-        android:textColor="@color/white"
-        android:textSize="15sp">
-
-    </android.widget.Button>
-
-
-    <ProgressBar
-        android:id="@+id/progressbarofmain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/getphonenumber"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:visibility="invisible">
-
-    </ProgressBar>
+        </com.hbb20.CountryCodePicker>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </RelativeLayout>

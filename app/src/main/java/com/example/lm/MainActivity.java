@@ -23,43 +23,40 @@ public class MainActivity extends AppCompatActivity {
 
     EditText mgetphonenumber;
     android.widget.Button msendotp;
+
     CountryCodePicker mcountrycodepicker;
-    String countrycode;
-    String phonenumber;
+    ProgressBar mprogressbarofmain;
+    PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    String countrycode, phonenumber, codesent;
 
     FirebaseAuth firebaseAuth;
-    ProgressBar mprogressbarofmain;
 
-
-
-    PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-    String codesent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mcountrycodepicker=findViewById(R.id.countrycodepicker);
         msendotp=findViewById(R.id.sendotpbutton);
         mgetphonenumber=findViewById(R.id.getphonenumber);
         mprogressbarofmain=findViewById(R.id.progressbarofmain);
 
-        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
 
-        countrycode=mcountrycodepicker.getSelectedCountryCodeWithPlus();
-
+        countrycode = mcountrycodepicker.getSelectedCountryCodeWithPlus();
         mcountrycodepicker.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
             @Override
             public void onCountrySelected() {
-                countrycode=mcountrycodepicker.getSelectedCountryCodeWithPlus();
+                countrycode = mcountrycodepicker.getSelectedCountryCodeWithPlus();
             }
         });
 
         msendotp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String number;
-                number=mgetphonenumber.getText().toString();
+
+                String number = mgetphonenumber.getText().toString();
                 if(number.isEmpty())
                 {
                     Toast.makeText(getApplicationContext(),"Пожалуйста введите ваш номер телефона",Toast.LENGTH_SHORT).show();
@@ -70,37 +67,28 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-
                     mprogressbarofmain.setVisibility(View.VISIBLE);
-                    phonenumber=countrycode+number;
-
+                    phonenumber = countrycode+number;
                     PhoneAuthOptions options=PhoneAuthOptions.newBuilder(firebaseAuth)
                             .setPhoneNumber(phonenumber)
                             .setTimeout(60L, TimeUnit.SECONDS)
                             .setActivity(MainActivity.this)
                             .setCallbacks(mCallbacks)
                             .build();
-
-
                     PhoneAuthProvider.verifyPhoneNumber(options);
-
                 }
             }
         });
 
 
-
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                //how to automatically fetch code here
             }
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
-
             }
-
 
             @Override
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
@@ -111,22 +99,22 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent=new Intent(MainActivity.this, com.example.lm.otpAuthentication.class);
                 intent.putExtra("otp",codesent);
                 startActivity(intent);
+                finish();
             }
         };
 
-
-
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null)
-        {
-            Intent intent=new Intent(MainActivity.this, com.example.lm.chatActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        }
 
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if(FirebaseAuth.getInstance().getCurrentUser()!=null)
+//        {
+//            Intent intent=new Intent(MainActivity.this, com.example.lm.chatActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//        }
+//    }
+
 }

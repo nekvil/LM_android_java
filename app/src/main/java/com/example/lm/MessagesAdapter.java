@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,13 +19,14 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     Context context;
     ArrayList<Messages> messagesArrayList;
 
-    int ITEM_SEND=1;
-    int ITEM_RECIEVE=2;
+    int ITEM_SEND = 1;
+    int ITEM_RECIEVE = 2;
 
     public MessagesAdapter(Context context, ArrayList<Messages> messagesArrayList) {
         this.context = context;
         this.messagesArrayList = messagesArrayList;
     }
+
 
     @NonNull
     @Override
@@ -41,6 +43,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         }
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
@@ -50,6 +53,14 @@ public class MessagesAdapter extends RecyclerView.Adapter {
             SenderViewHolder viewHolder=(SenderViewHolder)holder;
             viewHolder.textViewmessaage.setText(messages.getMessage());
             viewHolder.timeofmessage.setText(messages.getCurrenttime());
+            if (messages.isSeen()){
+                viewHolder.seen.setVisibility(View.VISIBLE);
+                viewHolder.delivered.setVisibility(View.GONE);
+            }
+            else{
+                viewHolder.seen.setVisibility(View.GONE);
+                viewHolder.delivered.setVisibility(View.VISIBLE);
+            }
         }
         else
         {
@@ -65,7 +76,6 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         Messages messages=messagesArrayList.get(position);
         if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(messages.getSenderId()))
-
         {
             return  ITEM_SEND;
         }
@@ -75,6 +85,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         }
     }
 
+
     @Override
     public int getItemCount() {
         return messagesArrayList.size();
@@ -83,23 +94,23 @@ public class MessagesAdapter extends RecyclerView.Adapter {
 
     class SenderViewHolder extends RecyclerView.ViewHolder
     {
-
-        TextView textViewmessaage;
-        TextView timeofmessage;
-
+        TextView textViewmessaage, timeofmessage;
+        ImageView delivered, seen;
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewmessaage=itemView.findViewById(R.id.sendermessage);
-            timeofmessage=itemView.findViewById(R.id.timeofmessage);
+            textViewmessaage = itemView.findViewById(R.id.sendermessage);
+            timeofmessage = itemView.findViewById(R.id.timeofmessage);
+            delivered = itemView.findViewById(R.id.status_of_seen);
+            seen = itemView.findViewById(R.id.status_of_seen_2);
+
         }
     }
 
+
     class RecieverViewHolder extends RecyclerView.ViewHolder
     {
-
-        TextView textViewmessaage;
-        TextView timeofmessage;
+        TextView textViewmessaage, timeofmessage;
 
         public RecieverViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,8 +118,5 @@ public class MessagesAdapter extends RecyclerView.Adapter {
             timeofmessage=itemView.findViewById(R.id.timeofmessage);
         }
     }
-
-
-
 
 }

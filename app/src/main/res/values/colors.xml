@@ -8,6 +8,18 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#272727</color>
+
     <color name="white_87">#DEFFFFFF</color>
     <color name="white_60">#99FFFFFF</color>
+    <color name="main">#FFEC144C</color>
+    <color name="main_80">#B6123C</color>
+    <color name="background_dark">#161616</color>
+
+    <color name="toolbar_dark">#202020</color>
+
+    <color name="rec_chat_light">#F5F5F5</color>
+    <color name="sen_chat_light">#EAB4C2</color>
+
+    <color name="rec_chat_night">#242424</color>
+    <color name="sen_chat_night">#B6123C</color>
 </resources>

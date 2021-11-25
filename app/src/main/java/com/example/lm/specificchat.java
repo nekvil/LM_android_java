@@ -2,11 +2,16 @@ package com.example.lm;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -20,8 +25,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -29,53 +34,69 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 
 public class specificchat extends AppCompatActivity {
 
-    EditText mgetmessage;
-    ImageButton msendmessagebutton;
+    Intent intent;
 
+    EditText mgetmessage;
+    Button msendmessagebutton;
     CardView msendmessagecardview;
     androidx.appcompat.widget.Toolbar mtoolbarofspecificchat;
     ImageView mimageviewofspecificuser;
+    ImageButton mbackbuttonofspecificchat;
     TextView mnameofspecificuser, mstatus_of_user;
+    RecyclerView mmessagerecyclerview;
+    com.example.lm.MessagesAdapter messagesAdapter;
+    ArrayList<Messages> messagesArrayList;
+    ValueEventListener statusListener, seenListener, messagesListener;
+    DatabaseReference statusReference, seenReference, messagesReference;
 
     private String enteredmessage;
-    Intent intent;
-    String mrecievername;
-    String sendername;
-    String mrecieveruid;
-    String msenderuid;
-    String mrecieverstatus;
-    private FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase;
-    String senderroom,recieverroom;
 
-    ImageButton mbackbuttonofspecificchat;
-
-    RecyclerView mmessagerecyclerview;
-
+    String mrecieverstatus, mrecieverTypingTo;
+    String sendername, mrecievername;
+    String mrecieveruid, msenderuid;
+    String senderroom,receiverroom;
     String currenttime;
+
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
 
-    com.example.lm.MessagesAdapter messagesAdapter;
-    ArrayList<Messages> messagesArrayList;
+    private FirebaseAuth firebaseAuth;
+    FirebaseDatabase firebaseDatabase;
     FirebaseFirestore firebaseFirestore;
 
+    long delay = 5000; // 5 seconds after user stops typing
+    long last_text_edit = 0;
+
+    Handler handler = new Handler();
+    Handler tHandler = new Handler();
+
+    Boolean dark;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_specificchat);
+
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                dark = true;
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                dark = false;
+                break;
+        }
 
         mgetmessage=findViewById(R.id.getmessage);
         msendmessagecardview=findViewById(R.id.carviewofsendmessage);
@@ -102,7 +123,7 @@ public class specificchat extends AppCompatActivity {
 //        mtoolbarofspecificchat.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                Toast.makeText(getApplicationContext(),"ХОБА!",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(),"Open profile user",Toast.LENGTH_SHORT).show();
 //            }
 //        });
 
@@ -110,28 +131,64 @@ public class specificchat extends AppCompatActivity {
         firebaseDatabase=FirebaseDatabase.getInstance();
         firebaseFirestore= FirebaseFirestore.getInstance();
 
-        simpleDateFormat=new SimpleDateFormat("HH:mm");
+        simpleDateFormat=new SimpleDateFormat("HH:mm", Locale.getDefault());
 
         msenderuid=firebaseAuth.getUid();
-        mrecieveruid=getIntent().getStringExtra("receiveruid");
-        mrecievername=getIntent().getStringExtra("name");
-//        mrecieverstatus=getIntent().getStringExtra("status");
+        mrecieveruid=intent.getStringExtra("receiverUid");
+        mrecievername=intent.getStringExtra("name");
 
-        DatabaseReference databaseRef=firebaseDatabase.getReference(mrecieveruid);
 
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        mgetmessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                handler.removeCallbacks(input_finish_checker);
+
+                if (s.toString().trim().length() != 0)
+                { updateTypingToStatus(mrecieveruid); }
+                else
+                { updateTypingToStatus("None"); }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            { }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                if (s.length() > 0) {
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(input_finish_checker, delay);
+                } else { }
+            }
+        });
+
+
+        statusReference = firebaseDatabase.getReference(mrecieveruid);
+        statusListener = statusReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                tHandler.removeCallbacks(tRunnable);
+
                 userprofile muserprofile = snapshot.getValue(userprofile.class);
+                mrecieverTypingTo = muserprofile.getTypingTo();
                 mrecieverstatus = muserprofile.getUserStatus();
+//                mnameofspecificuser.setText(muserprofile.getUsername());
 
                 if (mrecieverstatus.equals("Offline")){
-                    mstatus_of_user.setText("Был(а) недавно");
-                    mstatus_of_user.setTextColor(getResources().getColor(R.color.white_87));
+                    mstatus_of_user.setText("был(а) недавно");
+                    if (dark) { mstatus_of_user.setTextColor(getResources().getColor(R.color.white_87)); }
+                    else{ mstatus_of_user.setTextColor(getResources().getColor(R.color.main_80)); }
+                }
+                else if (mrecieverTypingTo.equals(msenderuid)){
+                    if (dark) { mstatus_of_user.setTextColor(getResources().getColor(R.color.white)); }
+                    else{ mstatus_of_user.setTextColor(getResources().getColor(R.color.main)); }
+                    tHandler.postDelayed(tRunnable, 1*100);
                 }
                 else{
-                    mstatus_of_user.setText("В сети");
-                    mstatus_of_user.setTextColor(getResources().getColor(R.color.white));
+                    mstatus_of_user.setText("в сети");
+                    if (dark) { mstatus_of_user.setTextColor(getResources().getColor(R.color.white)); }
+                    else{ mstatus_of_user.setTextColor(getResources().getColor(R.color.main)); }
                 }
             }
 
@@ -142,12 +199,37 @@ public class specificchat extends AppCompatActivity {
             }
         });
 
+
         senderroom=msenderuid+mrecieveruid;
-        recieverroom=mrecieveruid+msenderuid;
+        receiverroom=mrecieveruid+msenderuid;
 
-        DatabaseReference databaseReference=firebaseDatabase.getReference().child("chats").child(senderroom).child("messages");
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        seenReference = firebaseDatabase.getReference().child("chats").child(receiverroom).child("messages");
+        seenListener = seenReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot snapshot : dataSnapshot.getChildren())
+                {
+                    Messages messages = snapshot.getValue(Messages.class);
+                    if (messages != null && messages.getSenderId().equals(mrecieveruid) && !messages.isSeen()) {
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("seen", true);
+                        snapshot.getRef().updateChildren(hashMap);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        messagesReference = firebaseDatabase.getReference().child("chats").child(senderroom).child("messages");
+        messagesListener = messagesReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 messagesArrayList.clear();
@@ -157,12 +239,10 @@ public class specificchat extends AppCompatActivity {
                     Messages messages=snapshot1.getValue(Messages.class);
                     messagesArrayList.add(messages);
                 }
-
                 messagesAdapter=new MessagesAdapter(specificchat.this,messagesArrayList);
                 mmessagerecyclerview.setAdapter(messagesAdapter);
                 mmessagerecyclerview.smoothScrollToPosition(mmessagerecyclerview.getAdapter().getItemCount());
-                messagesAdapter.notifyDataSetChanged();
-
+//                messagesAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -179,16 +259,16 @@ public class specificchat extends AppCompatActivity {
         });
 
         mnameofspecificuser.setText(mrecievername);
-        String uri=intent.getStringExtra("imageuri");
+
+        String uri=intent.getStringExtra("imageURI");
         if(uri.isEmpty())
         {
             Toast.makeText(getApplicationContext(),"Empty image",Toast.LENGTH_SHORT).show();
         }
         else
         {
-            Picasso.get().load(uri).into(mimageviewofspecificuser);
+            Glide.with(this).load(uri).centerCrop().into(mimageviewofspecificuser);
         }
-
 
         msendmessagebutton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,20 +287,22 @@ public class specificchat extends AppCompatActivity {
                     calendar=Calendar.getInstance();
                     currenttime=simpleDateFormat.format(calendar.getTime());
 
-                    Messages messages=new Messages(enteredmessage,firebaseAuth.getUid(),date.getTime(),currenttime);
+                    Messages senderRoom = new Messages(enteredmessage,firebaseAuth.getUid(),date.getTime(),currenttime,false);
+                    Messages receiverRoom = new Messages(enteredmessage,firebaseAuth.getUid(),date.getTime(),currenttime,true);
                     firebaseDatabase=FirebaseDatabase.getInstance();
                     firebaseDatabase.getReference().child("chats")
                             .child(senderroom)
                             .child("messages")
-                            .push().setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            .push()
+                            .setValue(senderRoom).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             firebaseDatabase.getReference()
                                     .child("chats")
-                                    .child(recieverroom)
+                                    .child(receiverroom)
                                     .child("messages")
                                     .push()
-                                    .setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    .setValue(receiverRoom).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
 
@@ -236,28 +318,55 @@ public class specificchat extends AppCompatActivity {
 
     }
 
-    @SuppressLint("NonConstantResourceId")
+
+    private Runnable input_finish_checker = new Runnable() {
+        public void run() {
+            if (System.currentTimeMillis() > (last_text_edit + delay - 500)) {
+                updateTypingToStatus("None");
+            }
+        }
+    };
+
+
+    private Runnable tRunnable = new Runnable() {
+        int count = 0;
+        @Override
+        public void run() {
+            count++;
+
+            if (count == 1)
+            { mstatus_of_user.setText("печатает"); }
+            else if (count == 2)
+            { mstatus_of_user.setText("печатает."); }
+            else if (count == 3)
+            { mstatus_of_user.setText("печатает.."); }
+            else if (count == 4)
+            { mstatus_of_user.setText("печатает..."); }
+
+            if (count == 4)
+                count = 0;
+
+            tHandler.postDelayed(this, 5*100);
+        }
+    };
+
+
+    private void updateTypingToStatus(String typingTo){
+        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("typingTo");
+        presenceRef.setValue(typingTo);
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId())
         {
-
             case R.id.video_call:
-                Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
-                break;
             case R.id.search:
-                Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
-                break;
             case R.id.clean_story:
-                Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
-                break;
             case R.id.change_colors:
-                Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
-                break;
             case R.id.off_not:
-                Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
-                break;
             case R.id.delete_chat:
                 Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
                 break;
@@ -282,51 +391,26 @@ public class specificchat extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        documentReference.update("status","Online").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-//                Toast.makeText(getApplicationContext(),"Now User is Online",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
-        presenceRef.setValue("Online");
-
-        messagesAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        documentReference.update("status","Offline").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-//                Toast.makeText(getApplicationContext(),"Now User is Offline",Toast.LENGTH_SHORT).show();
-            }
-        });
-        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
-        presenceRef.setValue("Offline");
-    }
 
     @Override
     public void onStop() {
         super.onStop();
-        if(messagesAdapter!=null)
-        {
-            messagesAdapter.notifyDataSetChanged();
-        }
+        statusReference.removeEventListener(statusListener);
+        seenReference.removeEventListener(seenListener);
+        messagesReference.removeEventListener(messagesListener);
     }
 
+
     @Override
-    protected void onResume() {
-        super.onResume();
-        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
-        presenceRef.onDisconnect().setValue("Offline");
+    public void onPause() {
+        super.onPause();
+        updateTypingToStatus("None");
+
+//        if(messagesAdapter!=null)
+//        {
+//            messagesAdapter.notifyDataSetChanged();
+//        }
+
     }
 
 }

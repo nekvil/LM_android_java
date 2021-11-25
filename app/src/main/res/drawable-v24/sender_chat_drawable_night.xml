@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <solid android:color="#DE89132F">
+    <solid android:color="@color/sen_chat_night">
 
     </solid>
 
-    <corners android:radius="10dp"></corners>
+    <corners android:radius="10dp">
 
-
+    </corners>
 
 </shape>

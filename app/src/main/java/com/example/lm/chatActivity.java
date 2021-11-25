@@ -1,8 +1,6 @@
 package com.example.lm;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,16 +9,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -41,10 +36,6 @@ public class chatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        /*
-        Код табов
-        */
-
 //        tabLayout=findViewById(R.id.include);
 //        mchat=findViewById(R.id.chat);
 //        mcall=findViewById(R.id.calls);
@@ -57,9 +48,12 @@ public class chatActivity extends AppCompatActivity {
 
         mtoolbar=findViewById(R.id.toolbar);
         setSupportActionBar(mtoolbar);
+//        Drawable drawable= ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_baseline_more_vert_24);
+//        mtoolbar.setOverflowIcon(drawable);
 
-        Drawable drawable= ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_baseline_more_vert_24);
-        mtoolbar.setOverflowIcon(drawable);
+        /*
+        Works like shit
+        */
 
 //        pagerAdapter=new PagerAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
 //        viewPager.setAdapter(pagerAdapter);
@@ -91,11 +85,9 @@ public class chatActivity extends AppCompatActivity {
 //
 //        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-
     }
 
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -105,7 +97,6 @@ public class chatActivity extends AppCompatActivity {
                 Intent intent=new Intent(chatActivity.this,UpdateProfile.class);
                 startActivity(intent);
                 break;
-
             case R.id.settings:
                 Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
                 break;
@@ -116,13 +107,28 @@ public class chatActivity extends AppCompatActivity {
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
 
         getMenuInflater().inflate(R.menu.menu,menu);
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) menuItem.getActionView();
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint("Поиск");
         searchView.findViewById(androidx.appcompat.R.id.search_plate).setBackground(null);
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                setItemsVisibility(menu, searchItem, false);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                setItemsVisibility(menu, searchItem, true);
+                return true;
+            }
+        });
+
 //        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 //            @Override
 //            public boolean onQueryTextSubmit(String s) {
@@ -135,37 +141,34 @@ public class chatActivity extends AppCompatActivity {
 //            }
 //        });
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
+
+    private void setItemsVisibility(@NonNull Menu menu, MenuItem exception, boolean visible) {
+        for (int i=0; i<menu.size(); ++i) {
+            MenuItem item = menu.getItem(i);
+            if (item != exception)
+            { item.setVisible(visible); }
+        }
+    }
+
+
     @Override
-    protected void onPause() {
-        super.onPause();
-        DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        documentReference.update("status","Offline").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-//                Toast.makeText(getApplicationContext(),"Now User is Offline",Toast.LENGTH_SHORT).show();
-            }
-        });
+    protected void onDestroy() {
+        super.onDestroy();
         DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
         presenceRef.setValue("Offline");
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
-        DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        documentReference.update("status","Online").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-//                Toast.makeText(getApplicationContext(),"Now User is Online",Toast.LENGTH_SHORT).show();
-            }
-        });
-
         DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
         presenceRef.setValue("Online");
     }
+
 
     @Override
     protected void onResume() {

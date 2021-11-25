@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,35 +33,33 @@ import java.util.Calendar;
 
 public class chatFragment extends Fragment {
 
+    private FirestoreRecyclerAdapter<com.example.lm.firebasemodel,NoteViewHolder> chatAdapter;
     private FirebaseFirestore firebaseFirestore;
-    LinearLayoutManager linearLayoutManager;
     private FirebaseAuth firebaseAuth;
-    ArrayList<com.example.lm.Messages> messagesArrayList;
-    ImageView mimageviewofuser;
-
-
-
     FirebaseDatabase firebaseDatabase;
+//    DatabaseReference messagesReference;
+
+    LinearLayoutManager linearLayoutManager;
+    ArrayList<com.example.lm.Messages> messagesArrayList;
+
     String senderroom,recieverroom;
     String mrecievername,sendername,mrecieveruid,msenderuid;
-
-    FirestoreRecyclerAdapter<com.example.lm.firebasemodel,NoteViewHolder> chatAdapter;
 
     RecyclerView mrecyclerview;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.chatfragment,container,false);
 
-       View v=inflater.inflate(R.layout.chatfragment,container,false);
-       firebaseAuth=FirebaseAuth.getInstance();
-       firebaseFirestore= FirebaseFirestore.getInstance();
-       mrecyclerview=v.findViewById(R.id.recyclerview);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        mrecyclerview = v.findViewById(R.id.recyclerview);
 
         Query query=firebaseFirestore.collection("Users").whereNotEqualTo("uid",firebaseAuth.getUid());
         FirestoreRecyclerOptions<firebasemodel> allusername=new FirestoreRecyclerOptions.Builder<firebasemodel>().setQuery(query, firebasemodel.class).build();
 
-        chatAdapter=new FirestoreRecyclerAdapter<firebasemodel, NoteViewHolder>(allusername) {
+        chatAdapter = new FirestoreRecyclerAdapter<firebasemodel, NoteViewHolder>(allusername) {
 
 //            @Override
 //            public long getItemId(int position) {
@@ -76,18 +74,18 @@ public class chatFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull firebasemodel firebasemodel) {
 
+                Glide.with(getActivity()).load(firebasemodel.getImage()).centerCrop().into(noteViewHolder.mimageviewofuser);
                 noteViewHolder.particularusername.setText(firebasemodel.getName());
 
-                String uri=firebasemodel.getImage();
-                Picasso.get().load(uri).into(mimageviewofuser);
-//                System.out.println(uri);
                 msenderuid=firebaseAuth.getUid();
                 mrecieveruid= firebasemodel.getUid();
                 senderroom=msenderuid+mrecieveruid;
 
                 firebaseDatabase=FirebaseDatabase.getInstance();
                 DatabaseReference databaseReference=firebaseDatabase.getReference().child("chats").child(senderroom).child("messages");
+
                 messagesArrayList=new ArrayList<>();
+
                 databaseReference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -119,20 +117,17 @@ public class chatFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
                     }
-                });
 
-//                noteViewHolder.last_message.setTextColor(getResources().getColor(R.color.white_60));
+                });
 
                 noteViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent=new Intent(getActivity(), specificchat.class);
                         intent.putExtra("name",firebasemodel.getName());
-                        intent.putExtra("receiveruid",firebasemodel.getUid());
-                        intent.putExtra("imageuri",firebasemodel.getImage());
-                        intent.putExtra("status",firebasemodel.getStatus());
+                        intent.putExtra("receiverUid",firebasemodel.getUid());
+                        intent.putExtra("imageURI", firebasemodel.getImage());
                         startActivity(intent);
                     }
                 });
@@ -141,33 +136,28 @@ public class chatFragment extends Fragment {
             @NonNull
             @Override
             public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
                 View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.chatviewlayout,parent,false);
                 return new NoteViewHolder(view);
             }
         };
 
         mrecyclerview.setHasFixedSize(true);
+//        mrecyclerview.setItemAnimator(null);
 //        chatAdapter.setHasStableIds(true);
-
         linearLayoutManager=new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-
         mrecyclerview.setLayoutManager(linearLayoutManager);
         mrecyclerview.setAdapter(chatAdapter);
-
-        chatAdapter.startListening();
 
         return v;
     }
 
 
-    public class
-    NoteViewHolder extends RecyclerView.ViewHolder
+    public class NoteViewHolder extends RecyclerView.ViewHolder
     {
         private TextView particularusername;
         private TextView last_message;
         private TextView date_of_message;
+        private ImageView mimageviewofuser;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -175,21 +165,26 @@ public class chatFragment extends Fragment {
             last_message=itemView.findViewById(R.id.last_message);
             date_of_message=itemView.findViewById(R.id.date_of_message);
             mimageviewofuser=itemView.findViewById(R.id.imageviewofuser);
-
         }
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        chatAdapter.startListening();
-//    }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if(chatAdapter!=null)
+    public void onStart() {
+        super.onStart();
+        chatAdapter.startListening();
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(chatAdapter != null)
         {
+            RecyclerView.LayoutManager layoutManager = mrecyclerview.getLayoutManager();
+            if (layoutManager != null) {
+                layoutManager.removeAllViews();
+            }
             chatAdapter.stopListening();
         }
     }

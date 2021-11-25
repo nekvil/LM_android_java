@@ -5,16 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
     tools:context=".chatActivity">
 
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
         android:layout_marginTop="0dp"
-        android:background="@color/ic_launcher_background">
+        android:background="?attr/colorSecondaryVariant"
+        app:elevation="5dp"
+        android:elevation="5dp"
+        tools:targetApi="lollipop"
+        android:theme="@style/MyThemeOverlay_Toolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -26,8 +30,9 @@
                 android:id="@+id/myapptext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                app:autoSizeTextType="uniform"
                 android:text="LM"
-                android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold">
 
@@ -37,7 +42,7 @@
         </RelativeLayout>
 
 
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
 <!--    <com.google.android.material.tabs.TabLayout-->
 <!--        android:id="@+id/include"-->
@@ -90,12 +95,11 @@
 <!--    </androidx.viewpager.widget.ViewPager>-->
 
     <!--Один фрагмент без табов-->
-    <androidx.fragment.app.FragmentContainerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fragment_container_view"
+        android:name="com.example.lm.chatFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:name="com.example.lm.chatFragment" />
+        android:layout_below="@id/toolbar" />
 
   </RelativeLayout>

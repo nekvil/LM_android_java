@@ -9,17 +9,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LM">
-        <activity android:name=".specificchat"/>
-        <activity android:name=".UpdateProfile" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".chatActivity" />
-        <activity android:name=".setProfile"
+        <activity
+            android:name=".specificchat"
+            android:launchMode="singleTop"
+            android:theme="@style/ChatTheme"/>
+        <activity
+            android:name=".UpdateProfile"
+            android:launchMode="singleTop"/>
+        <activity
+            android:name=".ProfileActivity"/>
+        <activity
+            android:name=".chatActivity"/>
+        <activity
+            android:name=".setProfile"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Auth"/>
-        <activity android:name=".otpAuthentication"
+        <activity
+            android:name=".otpAuthentication"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Auth"/>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/Theme.Auth"/>
-        <activity android:name=".splashscreen"
+        <activity
+            android:name=".splashscreen"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>

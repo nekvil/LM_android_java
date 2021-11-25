@@ -1,5 +1,7 @@
 package com.example.lm;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,12 +14,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,11 +31,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,58 +47,55 @@ import java.util.Map;
 
 public class UpdateProfile extends AppCompatActivity {
 
-    private  EditText mnewusername;
+    Intent intent;
+
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
-
-
     private FirebaseFirestore firebaseFirestore;
+    private FirebaseStorage firebaseStorage;
+    ListenerRegistration listenerRegistration;
+    ValueEventListener profileListener;
+    DatabaseReference profileReference;
 
     private ImageView mgetnewimageinimageview;
-
-    private StorageReference storageReference;
-
-    private String ImageURIacessToken;
-
-    private androidx.appcompat.widget.Toolbar mtoolbarofupdateprofile;
     private ImageButton mbackbuttonofupdateprofile;
+    private EditText mnewusername;
+    private TextView mcurrentStatus, muserPhone;
+    private StorageReference storageReference;
+    private androidx.appcompat.widget.Toolbar mtoolbarofupdateprofile;
 
+    private Uri imagepath;
+    public Boolean pathStatus;
+    public String ImageURIacessToken;
+    private static int PICK_IMAGE=123;
 
-   private FirebaseStorage firebaseStorage;
-
-
-   ProgressBar mprogressbarofupdateprofile;
-
-   private Uri imagepath;
-   public Boolean pathStatus;
-   Intent intent;
-
-   private static int PICK_IMAGE=123;
-
-   android.widget.Button mupdateprofilebutton;
-   String newname, oldname;
+    ProgressBar mprogressbarofupdateprofile;
+    android.widget.Button mupdateprofilebutton;
+    String newname, oldname, currentStatus, userPhone;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
-        pathStatus = false;
+        setSupportActionBar(mtoolbarofupdateprofile);
+
         mtoolbarofupdateprofile=findViewById(R.id.toolbarofupdateprofile);
         mbackbuttonofupdateprofile=findViewById(R.id.backbuttonofupdateprofile);
         mgetnewimageinimageview=findViewById(R.id.getnewuserimageinimageview);
         mprogressbarofupdateprofile=findViewById(R.id.progressbarofupdateprofile);
         mnewusername=findViewById(R.id.getnewusername);
+        mcurrentStatus=findViewById(R.id.currentStatus);
+        muserPhone = findViewById(R.id.userPhone);
         mupdateprofilebutton=findViewById(R.id.updateprofilebutton);
 
+        intent=getIntent();
         firebaseAuth=FirebaseAuth.getInstance();
         firebaseDatabase=FirebaseDatabase.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
         firebaseFirestore=FirebaseFirestore.getInstance();
 
-        intent=getIntent();
-
-        setSupportActionBar(mtoolbarofupdateprofile);
+        pathStatus = false;
 
         mbackbuttonofupdateprofile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,16 +104,37 @@ public class UpdateProfile extends AppCompatActivity {
             }
         });
 
-//        mnewusername.setText(intent.getStringExtra("nameofuser"));
+        DocumentReference docRef = firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
+        EventListener<DocumentSnapshot> eventListener = new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
+                if (snapshot != null && snapshot.exists()) {
+                    firebasemodel mfirebasemodel = snapshot.toObject(firebasemodel.class);
+                    ImageURIacessToken = mfirebasemodel.getImage();
+                    final Context  context = UpdateProfile.this;
+                    if (isValidContextForGlide(context)){
+                        Glide.with(UpdateProfile.this).load(ImageURIacessToken).centerCrop().into(mgetnewimageinimageview);
+                    }
+                }
+            }
+        };
 
-        DatabaseReference databaseRef=firebaseDatabase.getReference(firebaseAuth.getUid());
+        if (listenerRegistration == null ) {
+//            Toast.makeText(getApplicationContext(),"listenerRegistration",Toast.LENGTH_SHORT).show();
+            listenerRegistration = docRef.addSnapshotListener(eventListener);
+        }
 
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        profileReference = firebaseDatabase.getReference(firebaseAuth.getUid());
+        profileListener = profileReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userprofile muserprofile=snapshot.getValue(userprofile.class);
                 oldname = muserprofile.getUsername();
+                currentStatus = muserprofile.getUserStatus();
+                userPhone = firebaseAuth.getCurrentUser().getPhoneNumber();
                 mnewusername.setText(oldname);
+                mcurrentStatus.setText(currentStatus);
+                muserPhone.setText(userPhone);
             }
 
             @Override
@@ -120,36 +145,28 @@ public class UpdateProfile extends AppCompatActivity {
 
         mupdateprofilebutton.setVisibility(View.INVISIBLE);
         mnewusername.addTextChangedListener(new TextWatcher() {
-
             @Override
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
-                // TODO Auto-generated method stub
-
-                if (s.toString().equals(oldname) ) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().equals(oldname)) {
                     if (pathStatus){
                         mupdateprofilebutton.setVisibility(View.VISIBLE);
                     }
-                    else{
+                    else {
                         mupdateprofilebutton.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    mupdateprofilebutton.setVisibility(View.VISIBLE);
-
                 }
-
+                else {
+                    mupdateprofilebutton.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
 
             }
         });
@@ -168,7 +185,7 @@ public class UpdateProfile extends AppCompatActivity {
                 {
 //                    mprogressbarofupdateprofile.setVisibility(View.VISIBLE);
 
-                    userprofile muserprofile =new userprofile(newname,firebaseAuth.getUid(),"Online");
+                    userprofile muserprofile = new userprofile(newname,firebaseAuth.getUid(),"Online","None");
                     databaseReference.setValue(muserprofile);
 
                     if(imagepath!=null) {
@@ -193,47 +210,39 @@ public class UpdateProfile extends AppCompatActivity {
             }
         });
 
-        storageReference=firebaseStorage.getReference();
-        storageReference.child("Images").child(firebaseAuth.getUid()).child("Profile Pic").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                ImageURIacessToken=uri.toString();
-                Picasso.get().load(uri).fit().into(mgetnewimageinimageview);
+    }
+
+    public static boolean isValidContextForGlide(final Context context) {
+        if (context == null) {
+            return false;
+        }
+        if (context instanceof Activity) {
+            final Activity activity = (Activity) context;
+            if (activity.isDestroyed() || activity.isFinishing()) {
+                return false;
             }
-        });
+        }
+        return true;
     }
 
     private void updatenameoncloudfirestore() {
-
         DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
         Map<String , Object> userdata=new HashMap<>();
         userdata.put("name",newname);
         userdata.put("image",ImageURIacessToken);
         userdata.put("uid",firebaseAuth.getUid());
-//        userdata.put("status","Online");
-
-
-        documentReference.set(userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-//                Toast.makeText(getApplicationContext(),"Профиль успешно обновлён",Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
+        documentReference.set(userdata);
     }
 
     private void updateimagetostorage() {
+        storageReference=firebaseStorage.getReference();
+        StorageReference imageref = storageReference.child("Images").child(firebaseAuth.getUid()).child("Profile Pic");
 
-
-        StorageReference imageref=storageReference.child("Images").child(firebaseAuth.getUid()).child("Profile Pic");
-
-        Bitmap bitmap=null;
+        Bitmap bitmap = null;
         try {
             bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),imagepath);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -241,13 +250,10 @@ public class UpdateProfile extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.JPEG,25,byteArrayOutputStream);
         byte[] data=byteArrayOutputStream.toByteArray();
 
-
-        UploadTask uploadTask=imageref.putBytes(data);
-
+        UploadTask uploadTask = imageref.putBytes(data);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
                 imageref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -258,7 +264,7 @@ public class UpdateProfile extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(),"URI не получен",Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(),"URI не получен",Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -281,13 +287,32 @@ public class UpdateProfile extends AppCompatActivity {
 
         if(requestCode==PICK_IMAGE && resultCode==RESULT_OK)
         {
-            imagepath=data.getData();
+            if (data != null) {
+                imagepath=data.getData();
+            }
             mgetnewimageinimageview.setImageURI(imagepath);
             pathStatus = true;
             mupdateprofilebutton.setVisibility(View.VISIBLE);
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        listenerRegistration = docRef.addSnapshotListener(eventListener);
+//    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        profileReference.removeEventListener(profileListener);
+        if (listenerRegistration != null) {
+//            Toast.makeText(getApplicationContext(),"listenerRegistration.remove();",Toast.LENGTH_SHORT).show();
+            listenerRegistration.remove();
+        }
     }
 
 }
