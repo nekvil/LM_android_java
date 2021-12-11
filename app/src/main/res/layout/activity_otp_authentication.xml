@@ -85,7 +85,7 @@
             android:layout_height="55dp"
             android:maxWidth="300dp"
             android:minWidth="200dp"
-            android:text="Подтвердить"
+            android:text="Продолжить"
             android:textColor="?attr/colorPrimaryVariant"
             app:cornerRadius="15dp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -1,67 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_marginStart="50dp"
-    android:padding="2.5dp">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false">
 
-    <RelativeLayout
+
+    <TextView
+        android:id="@+id/date_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="5dp"
-        android:theme="@style/SenTheme"
-        android:id="@+id/layoutformessage">
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:text="15 ноября"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textSize="15sp"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/sendermessage"
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/date_group"
+        android:layout_gravity="end|center_vertical"
+        android:gravity="end"
+        android:layout_marginStart="50dp"
+        android:padding="2.5dp">
+
+
+        <com.example.lm.ChatFlexboxLayout
+            android:id="@+id/layoutformessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="62dp"
-            android:padding="7dp"
-            android:text="Sender Message Display Here"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            android:textSize="18sp" />
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="5dp"
+            android:gravity="start|center_vertical"
+            android:theme="@style/SenTheme"
+            app:viewPartMain="@+id/sendermessage"
+            app:viewPartSlave="@+id/lytStatusContainer">
 
-        <TextView
-            android:id="@+id/timeofmessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/sendermessage"
-            android:layout_marginStart="-67dp"
-            android:layout_toEndOf="@id/sendermessage"
-            android:padding="5dp"
-            android:text="00:00"
-            android:textAppearance="@android:style/TextAppearance.Small"
-            android:textSize="12sp" />
+            <TextView
+                android:id="@+id/sendermessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:padding="7dp"
+                android:text="Sender Message Display Here"
+                android:textAppearance="@android:style/TextAppearance.Large"
+                android:textColorLink="?attr/colorOnSecondary"
+                android:textSize="18sp" />
 
-        <ImageView
-            android:id="@+id/status_of_seen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/sendermessage"
-            android:layout_toEndOf="@+id/timeofmessage"
+            <RelativeLayout
+                android:id="@+id/lytStatusContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:gravity="end|bottom"
+                android:orientation="horizontal"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:layout_marginEnd="6dp"
+                android:paddingBottom="4dp"
+                android:minWidth="52dp">
 
-            android:layout_marginBottom="3dp"
-            android:layout_marginStart="2dp"
-            android:padding="2dp"
+                <TextView
+                    android:id="@+id/timeofmessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="2dp"
+                    android:text="00:00"
+                    android:textAppearance="@android:style/TextAppearance.Small"
+                    android:textSize="12sp" />
 
-            android:visibility="visible"
-            app:srcCompat="@drawable/ic_check_material" />
+                <ImageView
+                    android:id="@+id/status_of_seen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/timeofmessage"
+                    android:layout_marginStart="2dp"
+                    android:layout_toEndOf="@+id/timeofmessage"
+                    android:padding="3dp"
+                    android:visibility="visible"
+                    app:srcCompat="@drawable/ic_check_material" />
 
-        <ImageView
-            android:id="@+id/status_of_seen_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/sendermessage"
-            android:layout_toEndOf="@+id/timeofmessage"
+                <ImageView
+                    android:id="@+id/status_of_seen_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/timeofmessage"
+                    android:layout_marginStart="2dp"
+                    android:layout_toEndOf="@+id/timeofmessage"
+                    android:padding="0dp"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_double_check_material" />
 
-            android:layout_marginStart="-1dp"
-            android:padding="2dp"
+            </RelativeLayout>
 
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_double_check_material" />
+        </com.example.lm.ChatFlexboxLayout>
 
-    </RelativeLayout>
+    </LinearLayout >
+
+
+    <View
+        android:id="@+id/view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@android:color/transparent"
+        android:layout_below="@+id/linear" />
+
 
 </RelativeLayout>

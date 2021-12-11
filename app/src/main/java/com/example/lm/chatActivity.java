@@ -2,34 +2,44 @@ package com.example.lm;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
+import android.os.Handler;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.tabs.TabItem;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class chatActivity extends AppCompatActivity {
 
-    TabLayout tabLayout;
-    TabItem mchat,mcall,mstatus;
-    ViewPager viewPager;
-    PagerAdapter pagerAdapter;
-    androidx.appcompat.widget.Toolbar mtoolbar;
+//    TabLayout tabLayout;
+//    TabItem mchat,mcall,mstatus;
+//    ViewPager viewPager;
+//    PagerAdapter pagerAdapter;
+
+    TextView appTitleName;
+    androidx.appcompat.widget.Toolbar toolbar;
 
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
     FirebaseDatabase firebaseDatabase;
+
+    ValueEventListener connectedListener;
+    DatabaseReference connectedRef;
+
+    String userId;
+
+    Handler tHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +52,41 @@ public class chatActivity extends AppCompatActivity {
 ////        mstatus=findViewById(R.id.status);
 //        viewPager=findViewById(R.id.fragmentcontainer);
 
-        firebaseFirestore=FirebaseFirestore.getInstance();
-        firebaseAuth=FirebaseAuth.getInstance();
-        firebaseDatabase= FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        userId = firebaseAuth.getUid();
 
-        mtoolbar=findViewById(R.id.toolbar);
-        setSupportActionBar(mtoolbar);
-//        Drawable drawable= ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_baseline_more_vert_24);
-//        mtoolbar.setOverflowIcon(drawable);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        /*
-        Works like shit
-        */
+        appTitleName = findViewById(R.id.appTitleName);
+
+        connectedRef = firebaseDatabase.getReference(".info/connected");
+        connectedListener = connectedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                tHandler.removeCallbacks(tRunnable);
+                if (connected) {
+                    DatabaseReference userStatusRef = firebaseDatabase.getReference().child(userId).child("userStatus");
+                    userStatusRef.setValue("Online");
+                    userStatusRef.onDisconnect().setValue("Offline");
+
+                    DatabaseReference lastOnlineRef = firebaseDatabase.getReference().child(userId).child("lastOnline");
+                    lastOnlineRef.onDisconnect().setValue(ServerValue.TIMESTAMP);
+
+                    appTitleName.setText(R.string.short_app_name);
+                } else {
+                    tHandler.postDelayed(tRunnable, 100);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.err.println("Listener was cancelled");
+            }
+        });
 
 //        pagerAdapter=new PagerAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
 //        viewPager.setAdapter(pagerAdapter);
@@ -91,89 +124,89 @@ public class chatActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId())
-        {
-            case R.id.profile:
-                Intent intent=new Intent(chatActivity.this,UpdateProfile.class);
-                startActivity(intent);
-                break;
-            case R.id.settings:
-                Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
-                break;
+        if (item.getItemId() == R.id.profile){
+            Intent intent = new Intent(chatActivity.this, UpdateProfile.class);
+            startActivity(intent);
+        }else if (item.getItemId() == R.id.settings){
+            Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();
+        }
+        else{
+            return false;
         }
 
         return  true;
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu,menu);
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setQueryHint("Поиск");
-        searchView.findViewById(androidx.appcompat.R.id.search_plate).setBackground(null);
-
-        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                setItemsVisibility(menu, searchItem, false);
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                setItemsVisibility(menu, searchItem, true);
-                return true;
-            }
-        });
-
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//    @Override
+//    public boolean onCreateOptionsMenu(final Menu menu) {
+//
+//        getMenuInflater().inflate(R.menu.menu,menu);
+//        final MenuItem searchItem = menu.findItem(R.id.action_search);
+//        SearchView searchView = (SearchView) searchItem.getActionView();
+//        searchView.setQueryHint("Поиск");
+//        searchView.findViewById(androidx.appcompat.R.id.search_plate).setBackground(null);
+//
+//        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 //            @Override
-//            public boolean onQueryTextSubmit(String s) {
-//                return false;
+//            public boolean onMenuItemActionExpand(MenuItem item) {
+//                setItemsVisibility(menu, searchItem, false);
+//                return true;
 //            }
 //
 //            @Override
-//            public boolean onQueryTextChange(String s) {
-//                return false;
+//            public boolean onMenuItemActionCollapse(MenuItem item) {
+//                setItemsVisibility(menu, searchItem, true);
+//                return true;
 //            }
 //        });
+//
+////        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+////            @Override
+////            public boolean onQueryTextSubmit(String s) {
+////                return false;
+////            }
+////
+////            @Override
+////            public boolean onQueryTextChange(String s) {
+////                return false;
+////            }
+////        });
+//
+//        return super.onCreateOptionsMenu(menu);
+//    }
 
-        return super.onCreateOptionsMenu(menu);
-    }
+
+//    private void setItemsVisibility(@NonNull Menu menu, MenuItem exception, boolean visible) {
+//        for (int i=0; i<menu.size(); ++i) {
+//            MenuItem item = menu.getItem(i);
+//            if (item != exception)
+//            { item.setVisible(visible); }
+//        }
+//    }
 
 
-    private void setItemsVisibility(@NonNull Menu menu, MenuItem exception, boolean visible) {
-        for (int i=0; i<menu.size(); ++i) {
-            MenuItem item = menu.getItem(i);
-            if (item != exception)
-            { item.setVisible(visible); }
+    private final Runnable tRunnable = new Runnable() {
+        int count = 0;
+        @Override
+        public void run() {
+            count++;
+
+            if (count == 1)
+            { appTitleName.setText("Ожидание сети"); }
+            else if (count == 2)
+            { appTitleName.setText("Ожидание сети."); }
+            else if (count == 3)
+            { appTitleName.setText("Ожидание сети.."); }
+            else if (count == 4)
+            { appTitleName.setText("Ожидание сети..."); }
+
+            if (count == 4)
+                count = 0;
+
+            tHandler.postDelayed(this, 5*100);
         }
-    }
+    };
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
-        presenceRef.setValue("Offline");
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
-        presenceRef.setValue("Online");
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        DatabaseReference presenceRef=firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("userStatus");
-        presenceRef.onDisconnect().setValue("Offline");
-    }
 }

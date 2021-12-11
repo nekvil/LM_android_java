@@ -4,47 +4,47 @@
 
     <item android:id="@+id/call"
         android:title="Видеозвонок"
-        android:icon="@drawable/ic_phone_call_24"
+        android:icon="@drawable/ic_baseline_call"
         app:showAsAction="ifRoom">
     </item>
 
     <item android:id="@+id/video_call"
         android:title="Видеозвонок"
-        android:icon="@drawable/ic_icons8_camera_24"
+        android:icon="@drawable/ic_outline_photo_camera"
         app:showAsAction="never">
     </item>
 
     <item android:title="Поиск"
         android:id="@+id/search"
-        android:icon="@drawable/ic_icons8_search_24"
+        android:icon="@drawable/ic_baseline_search"
         app:showAsAction="never">
 
     </item>
 
     <item android:id="@+id/clean_story"
         android:title="Очистить историю"
-        android:icon="@drawable/ic_broom_cleaning_24"
+        android:icon="@drawable/ic_baseline_broom"
         app:showAsAction="never">
 
     </item>
 
     <item android:title="Изменить цвета"
         android:id="@+id/change_colors"
-        android:icon="@drawable/ic_paint_brush_24"
+        android:icon="@drawable/ic_outline_brush"
         app:showAsAction="never">
 
     </item>
 
     <item android:id="@+id/off_not"
         android:title="Отключить уведомления"
-        android:icon="@drawable/ic_bell_silent_line_24"
+        android:icon="@drawable/ic_outline_notifications_off"
         app:showAsAction="never">
 
     </item>
 
     <item android:title="Удалить чат"
         android:id="@+id/delete_chat"
-        android:icon="@drawable/ic_recycle_bin_line_24"
+        android:icon="@drawable/ic_baseline_delete_outline"
         app:showAsAction="never">
 
     </item>

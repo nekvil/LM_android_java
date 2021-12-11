@@ -21,13 +21,13 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText mgetphonenumber;
-    android.widget.Button msendotp;
+    EditText getPhoneNumber;
+    android.widget.Button sendOtpButton;
 
-    CountryCodePicker mcountrycodepicker;
-    ProgressBar mprogressbarofmain;
+    CountryCodePicker countryCodePicker;
+    ProgressBar progressBar;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-    String countrycode, phonenumber, codesent;
+    String countryCode, phoneNumber, sentCode;
 
     FirebaseAuth firebaseAuth;
 
@@ -37,26 +37,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mcountrycodepicker=findViewById(R.id.countrycodepicker);
-        msendotp=findViewById(R.id.sendotpbutton);
-        mgetphonenumber=findViewById(R.id.getphonenumber);
-        mprogressbarofmain=findViewById(R.id.progressbarofmain);
+        countryCodePicker = findViewById(R.id.countrycodepicker);
+        sendOtpButton = findViewById(R.id.sendotpbutton);
+        getPhoneNumber = findViewById(R.id.getphonenumber);
+        progressBar = findViewById(R.id.progressbarofmain);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        countrycode = mcountrycodepicker.getSelectedCountryCodeWithPlus();
-        mcountrycodepicker.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
+        countryCode = countryCodePicker.getSelectedCountryCodeWithPlus();
+        countryCodePicker.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
             @Override
             public void onCountrySelected() {
-                countrycode = mcountrycodepicker.getSelectedCountryCodeWithPlus();
+                countryCode = countryCodePicker.getSelectedCountryCodeWithPlus();
             }
         });
 
-        msendotp.setOnClickListener(new View.OnClickListener() {
+        sendOtpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                String number = mgetphonenumber.getText().toString();
+                String number = getPhoneNumber.getText().toString();
                 if(number.isEmpty())
                 {
                     Toast.makeText(getApplicationContext(),"Пожалуйста введите ваш номер телефона",Toast.LENGTH_SHORT).show();
@@ -67,10 +67,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    mprogressbarofmain.setVisibility(View.VISIBLE);
-                    phonenumber = countrycode+number;
-                    PhoneAuthOptions options=PhoneAuthOptions.newBuilder(firebaseAuth)
-                            .setPhoneNumber(phonenumber)
+                    progressBar.setVisibility(View.VISIBLE);
+                    phoneNumber = countryCode + number;
+                    PhoneAuthOptions options = PhoneAuthOptions.newBuilder(firebaseAuth)
+                            .setPhoneNumber(phoneNumber)
                             .setTimeout(60L, TimeUnit.SECONDS)
                             .setActivity(MainActivity.this)
                             .setCallbacks(mCallbacks)
@@ -94,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
                 Toast.makeText(getApplicationContext(),"Код отправлен",Toast.LENGTH_SHORT).show();
-                mprogressbarofmain.setVisibility(View.INVISIBLE);
-                codesent=s;
+                progressBar.setVisibility(View.INVISIBLE);
+                sentCode = s;
                 Intent intent=new Intent(MainActivity.this, com.example.lm.otpAuthentication.class);
-                intent.putExtra("otp",codesent);
+                intent.putExtra("otp", sentCode);
                 startActivity(intent);
                 finish();
             }

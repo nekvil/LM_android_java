@@ -12,6 +12,7 @@
         <activity
             android:name=".specificchat"
             android:launchMode="singleTop"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/ChatTheme"/>
         <activity
             android:name=".UpdateProfile"
@@ -32,7 +33,7 @@
             android:name=".MainActivity"
             android:theme="@style/Theme.Auth"/>
         <activity
-            android:name=".splashscreen"
+            android:name=".splashScreen"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>

@@ -5,16 +5,20 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,26 +33,40 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class setProfile extends AppCompatActivity {
 
-    private CardView mgetuserimage;
-    private ImageView mgetuserimageinimageview;
-    private Uri imagepath;
-    private EditText mgetusername;
-    private android.widget.Button msaveprofile;
-    private static int PICK_IMAGE=123;
-
-    ProgressBar mprogressbarofsetprofile;
+    private ImageView setUserImage;
+    private Uri imagePath;
+    private EditText setUserName;
+    Button saveUserProfileButton;
+    ProgressBar loadingProgressBar;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
-    private StorageReference storageReference;
     private FirebaseFirestore firebaseFirestore;
+    private FirebaseDatabase firebaseDatabase;
 
-    private String name, ImageUriAcessToken;
+    DatabaseReference profileRDRef;
+    StorageReference setUserImageRef;
+    DocumentReference profileFDRef;
+
+    private String userName, imageUriAccessToken, userId;
+
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    if (uri != null) {
+                        imagePath = uri;
+                        setUserImage.setImageURI(imagePath);
+                    }
+                }
+            });
 
 
     @Override
@@ -56,53 +74,72 @@ public class setProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_profile);
 
-        firebaseAuth=FirebaseAuth.getInstance();
-        firebaseStorage=FirebaseStorage.getInstance();
-        storageReference=firebaseStorage.getReference();
-        firebaseFirestore=FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
-        mgetusername=findViewById(R.id.getusername);
-        mgetuserimage=findViewById(R.id.getuserimage);
-        mgetuserimageinimageview=findViewById(R.id.getuserimageinimageview);
-        msaveprofile=findViewById(R.id.saveProfile);
-        mprogressbarofsetprofile=findViewById(R.id.progressbarofsetProfile);
+        userId = firebaseAuth.getUid();
 
-        mgetusername.setText(firebaseAuth.getCurrentUser().getPhoneNumber());
-        setDefaultProfile();
+        setUserName = findViewById(R.id.getusername);
+        setUserImage = findViewById(R.id.getuserimageinimageview);
+        saveUserProfileButton = findViewById(R.id.saveProfile);
+        loadingProgressBar = findViewById(R.id.progressbarofsetProfile);
 
-        mgetuserimage.setOnClickListener(new View.OnClickListener() {
+
+        if (firebaseAuth.getCurrentUser() != null){
+            setUserName.setText(firebaseAuth.getCurrentUser().getPhoneNumber());
+            setDefaultProfile();
+        }
+
+
+        setUserImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                startActivityForResult(intent,PICK_IMAGE);
+                mGetContent.launch("image/*");
             }
         });
 
 
-        msaveprofile.setOnClickListener(new View.OnClickListener() {
+        setUserName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                saveUserProfileButton.setEnabled(s.toString().trim().length() != 0);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        saveUserProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                name=mgetusername.getText().toString();
-                if(name.isEmpty())
+                userName = setUserName.getText().toString();
+                if(userName.isEmpty())
                 {
                     Toast.makeText(getApplicationContext(),"Имя пустое",Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    if(imagepath==null)
+                    if(imagePath == null)
                     {
                         String pkgName = getApplicationContext().getPackageName();
-                        Uri path = Uri.parse("android.resource://"+pkgName+"/" + R.drawable.defprof);
-                        imagepath = path;
-                        Toast.makeText(getApplicationContext(),"Установлено изборжание по умолчанию",Toast.LENGTH_SHORT).show();
+                        imagePath = Uri.parse("android.resource://"+pkgName+"/" + R.drawable.defprof);
                     }
 
-                    mprogressbarofsetprofile.setVisibility(View.VISIBLE);
+                    loadingProgressBar.setVisibility(View.VISIBLE);
                     sendDataForNewUser();
-                    Toast.makeText(getApplicationContext(),"Пользователь успешно зарегистрирован",Toast.LENGTH_SHORT).show();
-                    mprogressbarofsetprofile.setVisibility(View.INVISIBLE);
+                    loadingProgressBar.setVisibility(View.INVISIBLE);
 
-                    Intent intent=new Intent(setProfile.this, com.example.lm.chatActivity.class);
+                    Intent intent = new Intent(setProfile.this, com.example.lm.chatActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -113,38 +150,37 @@ public class setProfile extends AppCompatActivity {
 
     private void setDefaultProfile(){
         String pkgName = getApplicationContext().getPackageName();
-        Uri path = Uri.parse("android.resource://"+pkgName+"/" + R.drawable.defprof);
-        imagepath = path;
+        imagePath = Uri.parse("android.resource://"+pkgName+"/" + R.drawable.defprof);
         sendDataForNewUser();
-        imagepath = null;
+        imagePath = null;
     }
 
 
     private void sendDataForNewUser()
     {
-        sendDataToRealTimeDatabase();
+        sendDataToRealtimeDatabase();
     }
 
 
-    private void sendDataToRealTimeDatabase()
+    private void sendDataToRealtimeDatabase()
     {
-        name=mgetusername.getText().toString().trim();
-        FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference=firebaseDatabase.getReference(firebaseAuth.getUid());
-        userprofile muserprofile=new userprofile(name,firebaseAuth.getUid(),"Offline","None");
-        databaseReference.setValue(muserprofile);
+        Date date = new Date();
+        userName = setUserName.getText().toString().trim();
+        userprofile _userprofile = new userprofile(userName, firebaseAuth.getUid(), "Online", "None", date.getTime());
+
+        profileRDRef = firebaseDatabase.getReference(userId);
+        profileRDRef.setValue(_userprofile);
         sendImageToStorage();
     }
 
 
     private void sendImageToStorage()
     {
+        setUserImageRef = firebaseStorage.getReference().child("Images").child(userId).child("Profile Pic");
 
-        StorageReference imageref=storageReference.child("Images").child(firebaseAuth.getUid()).child("Profile Pic");
-
-        Bitmap bitmap=null;
+        Bitmap bitmap = null;
         try {
-            bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),imagepath);
+            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
         }
         catch (IOException e)
         {
@@ -152,68 +188,46 @@ public class setProfile extends AppCompatActivity {
         }
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,25,byteArrayOutputStream);
-        byte[] data=byteArrayOutputStream.toByteArray();
+        if (bitmap != null) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG,25,byteArrayOutputStream);
+        }
+        byte[] data = byteArrayOutputStream.toByteArray();
 
-        ///putting image to storage
-
-        UploadTask uploadTask=imageref.putBytes(data);
-
+        UploadTask uploadTask = setUserImageRef.putBytes(data);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                imageref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                setUserImageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        ImageUriAcessToken=uri.toString();
-//                        Toast.makeText(getApplicationContext(),"URI получен успешно",Toast.LENGTH_SHORT).show();
-                        sendDataTocloudFirestore();
+                        imageUriAccessToken = uri.toString();
+                        sendDataToCloudFirestore();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(),"URI не получен",Toast.LENGTH_SHORT).show();
+
                     }
                 });
-//                Toast.makeText(getApplicationContext(),"Изображение загружено",Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(),"Изображение не загружено",Toast.LENGTH_SHORT).show();
+
             }
         });
     }
 
 
-    private void sendDataTocloudFirestore() {
-        DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
+    private void sendDataToCloudFirestore() {
+        profileFDRef = firebaseFirestore.collection("Users").document(userId);
+
         Map<String , Object> userdata=new HashMap<>();
-        userdata.put("name",name);
-        userdata.put("image",ImageUriAcessToken);
-        userdata.put("uid",firebaseAuth.getUid());
-        documentReference.set(userdata);
+        userdata.put("name", userName);
+        userdata.put("image", imageUriAccessToken);
+        userdata.put("uid", userId);
 
-//        documentReference.set(userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-////                Toast.makeText(getApplicationContext(),"Данные успешно отправлены на Cloud Firestore",Toast.LENGTH_SHORT).show();
-//            }
-//        });
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK)
-        {
-            imagepath=data.getData();
-            mgetuserimageinimageview.setImageURI(imagepath);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-
+        profileFDRef.set(userdata);
     }
 
 

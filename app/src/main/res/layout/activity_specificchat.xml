@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".specificchat"
-    >
-
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarofspecificchat"
+        android:id="@+id/toolbarOfSpecificChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
         android:minHeight="?attr/actionBarSize"
         app:elevation="5dp"
         android:elevation="5dp"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="10dp"
         android:background="?attr/colorSecondaryVariant"
         tools:targetApi="lollipop"
         android:theme="@style/MyThemeOverlay_Toolbar">
@@ -30,7 +31,7 @@
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_baseline_arrow_back_24">
+                app:srcCompat="@drawable/ic_baseline_arrow_back">
 
             </ImageButton>
 
@@ -40,7 +41,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/backbuttonofspecificchat"
                 app:cardCornerRadius="35dp">
 
@@ -102,62 +103,154 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerviewofspecific"
+        android:id="@+id/specificChatRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/getmessage"
-        android:layout_below="@id/toolbarofspecificchat"
-        android:paddingBottom="5dp">
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@+id/chatBox"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarOfSpecificChat" />
 
-    </androidx.recyclerview.widget.RecyclerView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/scrollDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="30dp"
+        android:visibility="invisible"
 
-    <EditText
-        android:id="@+id/getmessage"
+        app:backgroundTint="?attr/colorSecondaryVariant"
+        app:fabSize="mini"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:layout_constraintBottom_toTopOf="@+id/chatBox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_down_arrow_24" />
+
+    <RelativeLayout
+        android:id="@+id/chatBox"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="55dp"
-        android:layout_marginBottom="5dp"
-        android:hint="Сообщение"
-        android:paddingStart="20dp"
-        android:paddingEnd="10dp"
-        android:textAlignment="textStart"
-        android:textSize="18sp" />
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/carviewofsendmessage"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="-50dp"
-        android:layout_marginBottom="8dp"
-        android:layout_toEndOf="@id/getmessage"
-        app:cardCornerRadius="45dp">
-
-
-        <Button
-            style="@style/Widget.MaterialComponents.Button.Icon"
-            android:id="@+id/imageviewsendmessage"
+        <EditText
+            android:id="@+id/getMessage"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+
+            android:hint="Сообщение"
+            android:maxLines="6"
+            android:minHeight="50dp"
             android:padding="10dp"
-            app:icon="@drawable/ic_baseline_arrow_forward_24">
-<!--            app:iconTint="?attr/colorPrimaryVariant"-->
 
-        </Button>
+            android:paddingStart="55dp"
+            android:paddingEnd="100dp"
+            android:textAlignment="textStart"
+
+            android:textSize="18sp">
+
+            <requestFocus />
+
+        </EditText>
 
 
-    </androidx.cardview.widget.CardView>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/choiceStickerButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
 
-<!--    <RelativeLayout-->
-<!--        android:elevation="5dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:layout_above="@id/getmessage"-->
-<!--        android:layout_marginBottom="4dp"-->
-<!--        android:theme="@style/LineTheme" />-->
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignBottom="@id/getMessage"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="5dp"
 
-</RelativeLayout>
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+
+            app:iconTint="?attr/colorChatButton"
+            app:cornerRadius="30dp"
+            app:icon="@drawable/ic_outline_emoji_emotions"
+            app:iconSize="26dp" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sendMessageButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+
+            android:visibility="gone"
+
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignBottom="@id/getMessage"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+
+            app:cornerRadius="30dp"
+            app:icon="@drawable/ic_baseline_send"
+            app:iconGravity="textEnd"
+            app:iconSize="26dp" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/attachFileButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignBottom="@id/getMessage"
+            android:layout_toStartOf="@+id/sendVoiceMessageButton"
+
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+
+            android:visibility="visible"
+
+            app:cornerRadius="30dp"
+            app:icon="@drawable/ic_baseline_attach_file"
+            app:iconSize="26dp"
+            app:iconTint="?attr/colorChatButton" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sendVoiceMessageButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignBottom="@id/getMessage"
+            android:layout_alignParentEnd="true"
+
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+
+            android:visibility="visible"
+
+            app:cornerRadius="30dp"
+            app:icon="@drawable/ic_baseline_keyboard_voice"
+            app:iconSize="26dp"
+            app:iconTint="?attr/colorChatButton" />
+
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

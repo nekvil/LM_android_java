@@ -27,14 +27,14 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/myapptext"
+                android:id="@+id/appTitleName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                app:autoSizeTextType="uniform"
-                android:text="LM"
+                android:text="@string/short_app_name"
                 android:textSize="20sp"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                app:autoSizeTextType="uniform">
 
             </TextView>
 
@@ -95,7 +95,7 @@
 <!--    </androidx.viewpager.widget.ViewPager>-->
 
     <!--Один фрагмент без табов-->
-    <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"
         android:name="com.example.lm.chatFragment"
         android:layout_width="match_parent"

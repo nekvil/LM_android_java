@@ -2,6 +2,8 @@ package com.example.lm;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -54,20 +56,39 @@ public class otpAuthentication extends AppCompatActivity {
             }
         });
 
+
+        mverifyotp.setEnabled(false);
+        mgetotp.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mverifyotp.setEnabled(s.toString().trim().length() >= 6);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
         mverifyotp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enteredotp=mgetotp.getText().toString();
+                enteredotp=mgetotp.getText().toString().trim();
                 if(enteredotp.isEmpty())
                 {
                     Toast.makeText(getApplicationContext(),"Введите код",Toast.LENGTH_SHORT).show();
                 }
                 else
-
                 {
                     mprogressbarofotpauth.setVisibility(View.VISIBLE);
-                    String coderecieved=getIntent().getStringExtra("otp");
-                    PhoneAuthCredential credential= PhoneAuthProvider.getCredential(coderecieved,enteredotp);
+                    String codeReceived = getIntent().getStringExtra("otp");
+                    PhoneAuthCredential credential= PhoneAuthProvider.getCredential(codeReceived,enteredotp);
                     signInWithPhoneAuthCredential(credential);
                 }
             }
@@ -114,7 +135,7 @@ public class otpAuthentication extends AppCompatActivity {
                                 finish();
                             }
                             else{
-                                Intent intent=new Intent(otpAuthentication.this, com.example.lm.setProfile.class);
+                                Intent intent=new Intent(otpAuthentication.this, setProfile.class);
                                 startActivity(intent);
                                 finish();
                             }

@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="lollipop">#EFEFEF</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">#DCDCDC</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
 
 
@@ -24,6 +24,11 @@
 
     <style name="LineTheme" parent="Theme.LM">
         <item name="android:background">#26000000</item>
+    </style>
+
+    <style name="MessagesCountTheme" parent="Theme.LM">
+        <item name="android:background" >@drawable/messages_count_background</item>
+        <item name="android:textColor" >@color/white</item>
     </style>
 
     <style name="RecTheme" parent="Theme.LM">
@@ -40,6 +45,7 @@
 
     <style name="ChatTheme"  parent="Theme.LM">
         <item name="editTextStyle">@style/MessageBackTheme</item>
+        <item name="colorChatButton">@color/lightGrey</item>
     </style>
 
     <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">

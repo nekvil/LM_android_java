@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Little Messenger</string>
+    <string name="short_app_name">LM</string>
 </resources>

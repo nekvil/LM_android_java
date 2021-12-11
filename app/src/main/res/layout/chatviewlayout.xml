@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="72dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -9,6 +10,44 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/status_icon"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:elevation="5dp"
+            tools:targetApi="lollipop"
+            android:clipToPadding="false"
+            android:src="@drawable/circle_status"
+            android:layout_toEndOf="@+id/cardviewofuser"
+            android:layout_below="@+id/cardviewofuser"
+            android:layout_marginTop="-15dp"
+            android:layout_marginStart="-11dp"
+            android:visibility="gone">
+
+        </ImageView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardviewofuser"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            app:cardCornerRadius="55dp"
+            tools:targetApi="lollipop">
+
+            <ImageView
+                android:id="@+id/imageviewofuser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/defprof">
+
+            </ImageView>
+
+
+
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/nameofuser"
@@ -17,7 +56,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="20dp"
             android:layout_toStartOf="@+id/date_of_message"
             android:layout_toEndOf="@+id/cardviewofuser"
             android:ellipsize="end"
@@ -30,6 +69,45 @@
         </TextView>
 
         <TextView
+            android:id="@+id/last_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nameofuser"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toStartOf="@+id/messages_count"
+            android:layout_toEndOf="@id/cardviewofuser"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="Last message"
+            android:textSize="16sp"
+            android:visibility="invisible">
+
+        </TextView>
+
+        <ImageView
+            android:id="@+id/status_of_seen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="-6dp"
+            android:layout_toStartOf="@+id/date_of_message"
+            android:padding="5dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_check_material" />
+
+        <ImageView
+            android:id="@+id/status_of_seen_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="-8dp"
+            android:layout_toStartOf="@+id/date_of_message"
+            android:padding="2dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_double_check_material" />
+
+        <TextView
             android:id="@+id/date_of_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,46 +116,31 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="20dp"
-            android:text="date"
-            android:textSize="13sp">
+            android:text="00:00"
+            android:textSize="13sp"
+            android:visibility="invisible">
 
         </TextView>
 
         <TextView
-            android:id="@+id/last_message"
+            android:id="@+id/messages_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/nameofuser"
+            android:layout_below="@id/date_of_message"
+            android:layout_alignParentEnd="true"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="5dp"
-            android:layout_toEndOf="@id/cardviewofuser"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="Last message"
-            android:textSize="16sp">
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:paddingStart="2.5dp"
+            android:paddingEnd="3dp"
+            android:text="1"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+            android:textSize="14sp"
+            android:theme="@style/MessagesCountTheme"
+            android:visibility="invisible">
 
         </TextView>
-
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardviewofuser"
-            android:layout_width="53dp"
-            android:layout_height="53dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            app:cardCornerRadius="55dp">
-
-            <ImageView
-                android:id="@+id/imageviewofuser"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/defprof">
-
-            </ImageView>
-
-        </androidx.cardview.widget.CardView>
 
         <RelativeLayout
             android:layout_width="match_parent"

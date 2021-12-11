@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 
-public class splashscreen extends AppCompatActivity {
+public class splashScreen extends AppCompatActivity {
 
     static boolean calledAlready = false;
 

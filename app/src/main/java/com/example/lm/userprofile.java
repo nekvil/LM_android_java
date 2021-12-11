@@ -2,30 +2,32 @@ package com.example.lm;
 
 public class userprofile {
 
-    public String username,userUID, userStatus, typingTo;
+    public String userName, userId, userStatus, typingTo;
+    long lastOnline;
 
     public userprofile() {
     }
 
-    public userprofile(String username, String userUID, String userStatus, String typingTo) {
-        this.username = username;
-        this.userUID = userUID;
+    public userprofile(String userName, String userId, String userStatus, String typingTo, long lastOnline) {
+        this.userName = userName;
+        this.userId = userId;
         this.userStatus = userStatus;
         this.typingTo = typingTo;
+        this.lastOnline = lastOnline;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public String getUserUID() {
-        return userUID;
+    public String getUserId() {
+        return userId;
     }
-    public void setUserUID(String userUID) {
-        this.userUID = userUID;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUserStatus() {
@@ -40,5 +42,12 @@ public class userprofile {
     }
     public void setTypingTo(String typingTo) {
         this.typingTo = typingTo;
+    }
+
+    public long getLastOnline() {
+        return lastOnline;
+    }
+    public void setLastOnline(long lastOnline) {
+        this.lastOnline = lastOnline;
     }
 }

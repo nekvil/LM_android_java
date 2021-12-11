@@ -2,7 +2,6 @@ package com.example.lm;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,8 +16,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -47,94 +48,129 @@ import java.util.Map;
 
 public class UpdateProfile extends AppCompatActivity {
 
-    Intent intent;
-
-    private FirebaseAuth firebaseAuth;
-    private FirebaseDatabase firebaseDatabase;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
+    FirebaseDatabase firebaseDatabase;
+    FirebaseAuth firebaseAuth;
+
+    DatabaseReference profileRef, connectedRef, userNameRef;
+    StorageReference setUserImageRef;
+    DocumentReference getUserImageRef;
+
     ListenerRegistration listenerRegistration;
-    ValueEventListener profileListener;
-    DatabaseReference profileReference;
+    ValueEventListener connectedListener;
+    EventListener<DocumentSnapshot> eventListener;
 
-    private ImageView mgetnewimageinimageview;
-    private ImageButton mbackbuttonofupdateprofile;
-    private EditText mnewusername;
-    private TextView mcurrentStatus, muserPhone;
-    private StorageReference storageReference;
-    private androidx.appcompat.widget.Toolbar mtoolbarofupdateprofile;
+    private ImageView setUserImage;
+    private EditText setUserName;
+    private TextView currentUserStatus;
+    private androidx.appcompat.widget.Toolbar toolbar;
 
-    private Uri imagepath;
+    TextView currentUserPhone;
+    ImageButton backButton;
+    ProgressBar updateProgressBar;
+    android.widget.Button updateUserProfileButton;
+
+    private Uri imagePath;
     public Boolean pathStatus;
-    public String ImageURIacessToken;
-    private static int PICK_IMAGE=123;
+    public String ImageUriAccessToken, newUserName, currentUserName, userId;
+    final Context  context = UpdateProfile.this;
 
-    ProgressBar mprogressbarofupdateprofile;
-    android.widget.Button mupdateprofilebutton;
-    String newname, oldname, currentStatus, userPhone;
+
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    if (uri != null) {
+                        imagePath = uri;
+                        setUserImage.setImageURI(imagePath);
+                        pathStatus = true;
+                        if (setUserName.getText().toString().trim().length() != 0)
+                            updateUserProfileButton.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
-        setSupportActionBar(mtoolbarofupdateprofile);
+        setSupportActionBar(toolbar);
 
-        mtoolbarofupdateprofile=findViewById(R.id.toolbarofupdateprofile);
-        mbackbuttonofupdateprofile=findViewById(R.id.backbuttonofupdateprofile);
-        mgetnewimageinimageview=findViewById(R.id.getnewuserimageinimageview);
-        mprogressbarofupdateprofile=findViewById(R.id.progressbarofupdateprofile);
-        mnewusername=findViewById(R.id.getnewusername);
-        mcurrentStatus=findViewById(R.id.currentStatus);
-        muserPhone = findViewById(R.id.userPhone);
-        mupdateprofilebutton=findViewById(R.id.updateprofilebutton);
+        toolbar = findViewById(R.id.toolbarofupdateprofile);
+        backButton = findViewById(R.id.backbuttonofupdateprofile);
+        setUserImage = findViewById(R.id.getnewuserimageinimageview);
+        updateProgressBar = findViewById(R.id.progressbarofupdateprofile);
+        setUserName = findViewById(R.id.getnewusername);
+        currentUserStatus = findViewById(R.id.currentStatus);
+        currentUserPhone = findViewById(R.id.userPhone);
+        updateUserProfileButton = findViewById(R.id.updateprofilebutton);
 
-        intent=getIntent();
-        firebaseAuth=FirebaseAuth.getInstance();
-        firebaseDatabase=FirebaseDatabase.getInstance();
-        firebaseStorage=FirebaseStorage.getInstance();
-        firebaseFirestore=FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
+        userId = firebaseAuth.getUid();
         pathStatus = false;
 
-        mbackbuttonofupdateprofile.setOnClickListener(new View.OnClickListener() {
+
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
 
-        DocumentReference docRef = firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        EventListener<DocumentSnapshot> eventListener = new EventListener<DocumentSnapshot>() {
+
+        connectedRef = firebaseDatabase.getReference(".info/connected");
+        connectedListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                if (connected) {
+                    currentUserStatus.setText("в сети");
+                } else {
+                    currentUserStatus.setText("был(а) недавно");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.err.println("Listener was cancelled");
+            }
+        };
+
+
+        getUserImageRef = firebaseFirestore.collection("Users").document(userId);
+        eventListener = new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
                 if (snapshot != null && snapshot.exists()) {
-                    firebasemodel mfirebasemodel = snapshot.toObject(firebasemodel.class);
-                    ImageURIacessToken = mfirebasemodel.getImage();
-                    final Context  context = UpdateProfile.this;
+                    firebasemodel _firebasemodel = snapshot.toObject(firebasemodel.class);
+                    if (_firebasemodel != null) {
+                        ImageUriAccessToken = _firebasemodel.getImage();
+                    }
                     if (isValidContextForGlide(context)){
-                        Glide.with(UpdateProfile.this).load(ImageURIacessToken).centerCrop().into(mgetnewimageinimageview);
+                        Glide.with(context).load(ImageUriAccessToken).centerCrop().into(setUserImage);
                     }
                 }
             }
         };
 
-        if (listenerRegistration == null ) {
-//            Toast.makeText(getApplicationContext(),"listenerRegistration",Toast.LENGTH_SHORT).show();
-            listenerRegistration = docRef.addSnapshotListener(eventListener);
-        }
+        if (firebaseAuth.getCurrentUser() != null)
+            currentUserPhone.setText(firebaseAuth.getCurrentUser().getPhoneNumber());
 
-        profileReference = firebaseDatabase.getReference(firebaseAuth.getUid());
-        profileListener = profileReference.addValueEventListener(new ValueEventListener() {
+        profileRef = firebaseDatabase.getReference(userId);
+        profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userprofile muserprofile=snapshot.getValue(userprofile.class);
-                oldname = muserprofile.getUsername();
-                currentStatus = muserprofile.getUserStatus();
-                userPhone = firebaseAuth.getCurrentUser().getPhoneNumber();
-                mnewusername.setText(oldname);
-                mcurrentStatus.setText(currentStatus);
-                muserPhone.setText(userPhone);
+                userprofile _userprofile = snapshot.getValue(userprofile.class);
+                if (_userprofile != null){
+                    currentUserName = _userprofile.getUserName();
+                    setUserName.setText(currentUserName);
+                }
             }
 
             @Override
@@ -143,20 +179,21 @@ public class UpdateProfile extends AppCompatActivity {
             }
         });
 
-        mupdateprofilebutton.setVisibility(View.INVISIBLE);
-        mnewusername.addTextChangedListener(new TextWatcher() {
+
+        setUserName.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().trim().equals(oldname)) {
-                    if (pathStatus){
-                        mupdateprofilebutton.setVisibility(View.VISIBLE);
-                    }
-                    else {
-                        mupdateprofilebutton.setVisibility(View.INVISIBLE);
-                    }
+                if (s.toString().trim().equals(currentUserName)) {
+                    if (pathStatus)
+                        updateUserProfileButton.setVisibility(View.VISIBLE);
+                    else
+                        updateUserProfileButton.setVisibility(View.INVISIBLE);
                 }
-                else {
-                    mupdateprofilebutton.setVisibility(View.VISIBLE);
+                else if (s.toString().trim().length() == 0){
+                    updateUserProfileButton.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    updateUserProfileButton.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -171,46 +208,44 @@ public class UpdateProfile extends AppCompatActivity {
             }
         });
 
-        DatabaseReference databaseReference=firebaseDatabase.getReference(firebaseAuth.getUid());
-        mupdateprofilebutton.setOnClickListener(new View.OnClickListener() {
+
+        userNameRef = firebaseDatabase.getReference().child(userId).child("username");
+        updateUserProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                newname=mnewusername.getText().toString().trim().replaceAll(" +", " ");;
-                if(newname.isEmpty())
+                newUserName = setUserName.getText().toString().trim().replaceAll(" +", " ");
+
+                if(newUserName.isEmpty())
                 {
                     Toast.makeText(getApplicationContext(),"Имя пустое",Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-//                    mprogressbarofupdateprofile.setVisibility(View.VISIBLE);
-
-                    userprofile muserprofile = new userprofile(newname,firebaseAuth.getUid(),"Online","None");
-                    databaseReference.setValue(muserprofile);
-
-                    if(imagepath!=null) {
-                        updateimagetostorage();
-                    }
-                    updatenameoncloudfirestore();
+//                    updateProgressBar.setVisibility(View.VISIBLE);
+                    userNameRef.setValue(newUserName);
+                    if(imagePath != null)
+                        uploadImageToStorage();
+                    updateDataOnCloudFirestore();
 
                     Toast.makeText(getApplicationContext(),"Обновление",Toast.LENGTH_SHORT).show();
-//                    mprogressbarofupdateprofile.setVisibility(View.INVISIBLE);
-                    finish();
                     Toast.makeText(getApplicationContext(),"Профиль успешно обновлён",Toast.LENGTH_SHORT).show();
+//                    updateProgressBar.setVisibility(View.INVISIBLE);
+                    finish();
                 }
             }
         });
-        
-        mgetnewimageinimageview.setOnClickListener(new View.OnClickListener() {
+
+
+        setUserImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                startActivityForResult(intent,PICK_IMAGE);
-
+                mGetContent.launch("image/*");
             }
         });
 
     }
+
 
     public static boolean isValidContextForGlide(final Context context) {
         if (context == null) {
@@ -218,64 +253,59 @@ public class UpdateProfile extends AppCompatActivity {
         }
         if (context instanceof Activity) {
             final Activity activity = (Activity) context;
-            if (activity.isDestroyed() || activity.isFinishing()) {
-                return false;
-            }
+            return !activity.isDestroyed() && !activity.isFinishing();
         }
         return true;
     }
 
-    private void updatenameoncloudfirestore() {
-        DocumentReference documentReference=firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        Map<String , Object> userdata=new HashMap<>();
-        userdata.put("name",newname);
-        userdata.put("image",ImageURIacessToken);
-        userdata.put("uid",firebaseAuth.getUid());
+
+    private void updateDataOnCloudFirestore() {
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(userId);
+        Map<String , Object> userdata = new HashMap<>();
+        userdata.put("name", newUserName);
+        userdata.put("image", ImageUriAccessToken);
+        userdata.put("uid", userId);
         documentReference.set(userdata);
     }
 
-    private void updateimagetostorage() {
-        storageReference=firebaseStorage.getReference();
-        StorageReference imageref = storageReference.child("Images").child(firebaseAuth.getUid()).child("Profile Pic");
+
+    private void uploadImageToStorage() {
+        setUserImageRef = firebaseStorage.getReference().child("Images").child(userId).child("Profile Pic");
 
         Bitmap bitmap = null;
         try {
-            bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),imagepath);
+            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,25,byteArrayOutputStream);
+
+        if (bitmap != null) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, byteArrayOutputStream);
+        }
         byte[] data=byteArrayOutputStream.toByteArray();
 
-        UploadTask uploadTask = imageref.putBytes(data);
+        UploadTask uploadTask = setUserImageRef.putBytes(data);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                imageref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                setUserImageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        ImageURIacessToken=uri.toString();
-//                        Toast.makeText(getApplicationContext(),"URI получен успешно",Toast.LENGTH_SHORT).show();
-                        updatenameoncloudfirestore();
+                        ImageUriAccessToken=uri.toString();
+                        updateDataOnCloudFirestore();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-//                        Toast.makeText(getApplicationContext(),"URI не получен",Toast.LENGTH_SHORT).show();
                     }
-
-
                 });
-//                Toast.makeText(getApplicationContext(),"Изображение обновлено",Toast.LENGTH_SHORT).show();
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-//                Toast.makeText(getApplicationContext(),"Ошибка обновления изображения",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -283,36 +313,24 @@ public class UpdateProfile extends AppCompatActivity {
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK)
-        {
-            if (data != null) {
-                imagepath=data.getData();
-            }
-            mgetnewimageinimageview.setImageURI(imagepath);
-            pathStatus = true;
-            mupdateprofilebutton.setVisibility(View.VISIBLE);
+    protected void onStart() {
+        super.onStart();
+        if (listenerRegistration == null){
+            listenerRegistration = getUserImageRef.addSnapshotListener(eventListener);
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
+        connectedRef.addValueEventListener(connectedListener);
+//        Toast.makeText(getApplicationContext(),"UpdateProfile - onStart",Toast.LENGTH_SHORT).show();
     }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        listenerRegistration = docRef.addSnapshotListener(eventListener);
-//    }
 
 
     @Override
     protected void onStop() {
         super.onStop();
-        profileReference.removeEventListener(profileListener);
+        connectedRef.removeEventListener(connectedListener);
         if (listenerRegistration != null) {
-//            Toast.makeText(getApplicationContext(),"listenerRegistration.remove();",Toast.LENGTH_SHORT).show();
             listenerRegistration.remove();
         }
+//        Toast.makeText(getApplicationContext(),"UpdateProfile - onStop",Toast.LENGTH_SHORT).show();
     }
 
 }

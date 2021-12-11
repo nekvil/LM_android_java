@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ChatFlexboxLayout">
+        <attr name="viewPartMain" format="reference">250dp</attr>
+        <attr name="viewPartSlave" format="reference">60dp</attr>
+    </declare-styleable>
+
+    <attr name="colorChatButton" format="reference|color" />
+
+</resources>

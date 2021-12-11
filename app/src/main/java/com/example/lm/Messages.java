@@ -2,7 +2,7 @@ package com.example.lm;
 
 public class Messages {
 
-    String message, senderId, currenttime;
+    String message, senderId, currentTime;
     boolean seen;
     long timestamp;
 
@@ -11,11 +11,11 @@ public class Messages {
     }
 
 
-    public Messages(String message, String senderId, long timestamp, String currenttime, boolean seen) {
+    public Messages(String message, String senderId, long timestamp, String currentTime, boolean seen) {
         this.message = message;
         this.senderId = senderId;
         this.timestamp = timestamp;
-        this.currenttime = currenttime;
+        this.currentTime = currentTime;
         this.seen = seen;
     }
 
@@ -40,11 +40,11 @@ public class Messages {
         this.timestamp = timestamp;
     }
 
-    public String getCurrenttime() {
-        return currenttime;
+    public String getCurrentTime() {
+        return currentTime;
     }
-    public void setCurrenttime(String currenttime) {
-        this.currenttime = currenttime;
+    public void setCurrentTime(String currentTime) {
+        this.currentTime = currentTime;
     }
 
     public boolean isSeen() { return seen; }
