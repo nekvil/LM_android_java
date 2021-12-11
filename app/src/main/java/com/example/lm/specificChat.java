@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 
-public class specificchat extends AppCompatActivity {
+public class specificChat extends AppCompatActivity {
 
     private Button sendMessageButton, attachFileButton, sendVoiceMessageButton;
     private EditText getTextMessage;
@@ -131,7 +131,7 @@ public class specificchat extends AppCompatActivity {
         messageRecyclerView.setLayoutManager(linearLayoutManager);
 
         messagesArrayList = new ArrayList<>();
-        messagesAdapter = new MessagesAdapter(specificchat.this, messagesArrayList);
+        messagesAdapter = new MessagesAdapter(specificChat.this, messagesArrayList);
         messageRecyclerView.setAdapter(messagesAdapter);
 
         userName.setText(intent.getStringExtra("name"));
@@ -203,7 +203,7 @@ public class specificchat extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 tHandler.removeCallbacks(tRunnable);
 
-                userprofile userProfile = snapshot.getValue(userprofile.class);
+                userRDModel userProfile = snapshot.getValue(userRDModel.class);
 
                 if (userProfile != null) {
                     receiverTypingTo = userProfile.getTypingTo();
@@ -267,7 +267,7 @@ public class specificchat extends AppCompatActivity {
                 }
 
                 messagesAdapter.notifyDataSetChanged();
-//                messagesAdapter = new MessagesAdapter(specificchat.this,messagesArrayList);
+//                messagesAdapter = new MessagesAdapter(specificChat.this,messagesArrayList);
 //                messageRecyclerView.setAdapter(messagesAdapter);
                 if (recyclerViewState != null) {
                     recyclerViewState = null;

@@ -135,7 +135,7 @@ public class otpAuthentication extends AppCompatActivity {
                                 finish();
                             }
                             else{
-                                Intent intent=new Intent(otpAuthentication.this, setProfile.class);
+                                Intent intent=new Intent(otpAuthentication.this, setUsersProfile.class);
                                 startActivity(intent);
                                 finish();
                             }

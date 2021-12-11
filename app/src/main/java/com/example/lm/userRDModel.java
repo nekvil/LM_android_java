@@ -1,14 +1,14 @@
 package com.example.lm;
 
-public class userprofile {
+public class userRDModel {
 
     public String userName, userId, userStatus, typingTo;
     long lastOnline;
 
-    public userprofile() {
+    public userRDModel() {
     }
 
-    public userprofile(String userName, String userId, String userStatus, String typingTo, long lastOnline) {
+    public userRDModel(String userName, String userId, String userStatus, String typingTo, long lastOnline) {
         this.userName = userName;
         this.userId = userId;
         this.userStatus = userStatus;

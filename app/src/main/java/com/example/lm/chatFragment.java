@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class chatFragment extends Fragment {
 
-    private FirestoreRecyclerAdapter<firebasemodel,NoteViewHolder> chatAdapter;
+    private FirestoreRecyclerAdapter<userFDModel,NoteViewHolder> chatAdapter;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase;
@@ -88,9 +88,9 @@ public class chatFragment extends Fragment {
         senderUID = firebaseAuth.getUid();
 
         Query query = firebaseFirestore.collection("Users").whereNotEqualTo("uid",firebaseAuth.getUid());
-        FirestoreRecyclerOptions<firebasemodel> Users = new FirestoreRecyclerOptions.Builder<firebasemodel>().setQuery(query, firebasemodel.class).build();
+        FirestoreRecyclerOptions<userFDModel> Users = new FirestoreRecyclerOptions.Builder<userFDModel>().setQuery(query, userFDModel.class).build();
 
-        chatAdapter = new FirestoreRecyclerAdapter<firebasemodel, NoteViewHolder>(Users) {
+        chatAdapter = new FirestoreRecyclerAdapter<userFDModel, NoteViewHolder>(Users) {
 
 //            @Override
 //            public long getItemId(int position) {
@@ -103,15 +103,15 @@ public class chatFragment extends Fragment {
 //            }
 
             @Override
-            protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull firebasemodel _firebasemodel) {
+            protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull userFDModel _userFDModel) {
 //                Toast.makeText(getActivity(),"onBindViewHolder",Toast.LENGTH_SHORT).show();
                 final Context  context = getActivity();
                 if (isValidContextForGlide(context))
-                    Glide.with(context).load(_firebasemodel.getImage()).centerCrop().into(noteViewHolder.userImageView);
+                    Glide.with(context).load(_userFDModel.getImage()).centerCrop().into(noteViewHolder.userImageView);
 
-                noteViewHolder.userName.setText(_firebasemodel.getName());
+                noteViewHolder.userName.setText(_userFDModel.getName());
 
-                receiverUID = _firebasemodel.getUid();
+                receiverUID = _userFDModel.getUid();
                 senderRoom = senderUID + receiverUID;
 
                 firebaseDatabase = FirebaseDatabase.getInstance();
@@ -123,7 +123,7 @@ public class chatFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                         messagesArrayList.clear();
-//                        receiverUID = _firebasemodel.getUid();
+//                        receiverUID = _userFDModel.getUid();
 
                         for(DataSnapshot snapshot : dataSnapshot.getChildren())
                         {
@@ -226,26 +226,26 @@ public class chatFragment extends Fragment {
                 statusListener = statusReference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        userprofile UserProfile = dataSnapshot.getValue(userprofile.class);
+                        userRDModel _userRDModel = dataSnapshot.getValue(userRDModel.class);
 
 //                        Toast.makeText(getActivity(),"onDataChange statusListener",Toast.LENGTH_SHORT).show();
 
-                        if (UserProfile != null){
+                        if (_userRDModel != null){
 
-                            if (UserProfile.userStatus.equals("Online"))
+                            if (_userRDModel.userStatus.equals("Online"))
                                 noteViewHolder.status_icon.setVisibility(View.VISIBLE);
-                            else if (UserProfile.userStatus.equals("Offline"))
+                            else if (_userRDModel.userStatus.equals("Offline"))
                                 noteViewHolder.status_icon.setVisibility(View.GONE);
 
                             if (noteViewHolder.last_message.getText().toString().equals("Last message")
                                     || noteViewHolder.last_message.getText().toString().equals("был(а) недавно")
                                     || noteViewHolder.last_message.getText().toString().equals("в сети"))
                             {
-                                if (UserProfile.userStatus.equals("Online")){
+                                if (_userRDModel.userStatus.equals("Online")){
                                     noteViewHolder.last_message.setText("в сети");
                                     noteViewHolder.status_icon.setVisibility(View.VISIBLE);
                                 }
-                                else if (UserProfile.userStatus.equals("Offline")) {
+                                else if (_userRDModel.userStatus.equals("Offline")) {
                                     noteViewHolder.last_message.setText("был(а) недавно");
                                     noteViewHolder.status_icon.setVisibility(View.GONE);
                                 }
@@ -267,10 +267,10 @@ public class chatFragment extends Fragment {
                 noteViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent=new Intent(getActivity(), specificchat.class);
-                        intent.putExtra("name", _firebasemodel.getName());
-                        intent.putExtra("receiverUid", _firebasemodel.getUid());
-                        intent.putExtra("imageURI", _firebasemodel.getImage());
+                        Intent intent = new Intent(getActivity(), specificChat.class);
+                        intent.putExtra("name", _userFDModel.getName());
+                        intent.putExtra("receiverUid", _userFDModel.getUid());
+                        intent.putExtra("imageURI", _userFDModel.getImage());
                         startActivity(intent);
                     }
                 });
@@ -288,7 +288,7 @@ public class chatFragment extends Fragment {
         chatRecyclerView.setHasFixedSize(true);
 //        chatRecyclerView.setItemAnimator(null);
 //        chatAdapter.setHasStableIds(true);
-        linearLayoutManager=new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         chatRecyclerView.setLayoutManager(linearLayoutManager);
         chatRecyclerView.setAdapter(chatAdapter);
 

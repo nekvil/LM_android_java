@@ -1,18 +1,18 @@
 package com.example.lm;
 
-public class firebasemodel {
+public class userFDModel {
 
     String name;
     String image;
     String uid;
 
-    public firebasemodel(String name, String image, String uid) {
+    public userFDModel(String name, String image, String uid) {
         this.name = name;
         this.image = image;
         this.uid = uid;
     }
 
-    public firebasemodel() {
+    public userFDModel() {
     }
 
     public String getName() {

@@ -88,7 +88,7 @@ public class ProfileActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userprofile muserprofile=snapshot.getValue(userprofile.class);
+                userRDModel muserprofile=snapshot.getValue(userRDModel.class);
                 mviewusername.setText(muserprofile.getUserName());
             }
 
@@ -103,7 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
         mmovetoupdateprofile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(ProfileActivity.this, UpdateProfile.class);
+                Intent intent=new Intent(ProfileActivity.this, usersProfile.class);
                 intent.putExtra("nameofuser",mviewusername.getText().toString());
                 startActivity(intent);
             }

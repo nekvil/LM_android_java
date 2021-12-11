@@ -125,7 +125,7 @@ public class chatActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         if (item.getItemId() == R.id.profile){
-            Intent intent = new Intent(chatActivity.this, UpdateProfile.class);
+            Intent intent = new Intent(chatActivity.this, usersProfile.class);
             startActivity(intent);
         }else if (item.getItemId() == R.id.settings){
             Toast.makeText(getApplicationContext(),"Функция в разработке",Toast.LENGTH_SHORT).show();

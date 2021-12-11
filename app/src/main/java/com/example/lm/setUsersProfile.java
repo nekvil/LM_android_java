@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class setProfile extends AppCompatActivity {
+public class setUsersProfile extends AppCompatActivity {
 
     private ImageView setUserImage;
     private Uri imagePath;
@@ -139,7 +139,7 @@ public class setProfile extends AppCompatActivity {
                     sendDataForNewUser();
                     loadingProgressBar.setVisibility(View.INVISIBLE);
 
-                    Intent intent = new Intent(setProfile.this, com.example.lm.chatActivity.class);
+                    Intent intent = new Intent(setUsersProfile.this, com.example.lm.chatActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -166,10 +166,10 @@ public class setProfile extends AppCompatActivity {
     {
         Date date = new Date();
         userName = setUserName.getText().toString().trim();
-        userprofile _userprofile = new userprofile(userName, firebaseAuth.getUid(), "Online", "None", date.getTime());
+        userRDModel _userRDModel = new userRDModel(userName, firebaseAuth.getUid(), "Online", "None", date.getTime());
 
         profileRDRef = firebaseDatabase.getReference(userId);
-        profileRDRef.setValue(_userprofile);
+        profileRDRef.setValue(_userRDModel);
         sendImageToStorage();
     }
 

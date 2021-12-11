@@ -10,19 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LM">
         <activity
-            android:name=".specificchat"
+            android:name=".specificChat"
             android:launchMode="singleTop"
             android:windowSoftInputMode="stateHidden"
             android:theme="@style/ChatTheme"/>
         <activity
-            android:name=".UpdateProfile"
+            android:name=".usersProfile"
             android:launchMode="singleTop"/>
         <activity
             android:name=".ProfileActivity"/>
         <activity
             android:name=".chatActivity"/>
         <activity
-            android:name=".setProfile"
+            android:name=".setUsersProfile"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Auth"/>
         <activity

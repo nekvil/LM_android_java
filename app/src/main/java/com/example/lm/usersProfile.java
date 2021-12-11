@@ -46,7 +46,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateProfile extends AppCompatActivity {
+public class usersProfile extends AppCompatActivity {
 
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
@@ -74,7 +74,7 @@ public class UpdateProfile extends AppCompatActivity {
     private Uri imagePath;
     public Boolean pathStatus;
     public String ImageUriAccessToken, newUserName, currentUserName, userId;
-    final Context  context = UpdateProfile.this;
+    final Context  context = usersProfile.this;
 
 
     ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
@@ -148,9 +148,9 @@ public class UpdateProfile extends AppCompatActivity {
             @Override
             public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
                 if (snapshot != null && snapshot.exists()) {
-                    firebasemodel _firebasemodel = snapshot.toObject(firebasemodel.class);
-                    if (_firebasemodel != null) {
-                        ImageUriAccessToken = _firebasemodel.getImage();
+                    userFDModel _userFDModel = snapshot.toObject(userFDModel.class);
+                    if (_userFDModel != null) {
+                        ImageUriAccessToken = _userFDModel.getImage();
                     }
                     if (isValidContextForGlide(context)){
                         Glide.with(context).load(ImageUriAccessToken).centerCrop().into(setUserImage);
@@ -166,9 +166,9 @@ public class UpdateProfile extends AppCompatActivity {
         profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userprofile _userprofile = snapshot.getValue(userprofile.class);
-                if (_userprofile != null){
-                    currentUserName = _userprofile.getUserName();
+                userRDModel _userRDModel = snapshot.getValue(userRDModel.class);
+                if (_userRDModel != null){
+                    currentUserName = _userRDModel.getUserName();
                     setUserName.setText(currentUserName);
                 }
             }
@@ -209,7 +209,7 @@ public class UpdateProfile extends AppCompatActivity {
         });
 
 
-        userNameRef = firebaseDatabase.getReference().child(userId).child("username");
+        userNameRef = firebaseDatabase.getReference().child(userId).child("userName");
         updateUserProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -319,7 +319,7 @@ public class UpdateProfile extends AppCompatActivity {
             listenerRegistration = getUserImageRef.addSnapshotListener(eventListener);
         }
         connectedRef.addValueEventListener(connectedListener);
-//        Toast.makeText(getApplicationContext(),"UpdateProfile - onStart",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(),"usersProfile - onStart",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -330,7 +330,7 @@ public class UpdateProfile extends AppCompatActivity {
         if (listenerRegistration != null) {
             listenerRegistration.remove();
         }
-//        Toast.makeText(getApplicationContext(),"UpdateProfile - onStop",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(),"usersProfile - onStop",Toast.LENGTH_SHORT).show();
     }
 
 }
